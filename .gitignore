@@ -1,3 +1,15 @@
+# Cache directories (Python)
+__pycache__/
+*.pyc
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.webm
+
 # Binary files
 *.bin
 
