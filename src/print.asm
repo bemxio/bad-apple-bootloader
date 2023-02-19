@@ -16,3 +16,22 @@ print:
     print_end:
         popa ; restore registers
         ret ; return from the function
+
+line_break:
+    pusha ; save registers
+    mov ah, 0x0e ; change the interrupt mode to "Teletype Output"
+    
+    mov al, 0x0a ; move the line feed character into `al`
+    int 0x10 ; call the BIOS interrupt
+    
+    mov al, 0x0d ; move the carriage return character into `al`
+    int 0x10 ; call the BIOS interrupt
+    
+    popa ; restore registers
+    ret ; return from the function
+
+println:
+    call print
+    call line_break
+
+    ret
