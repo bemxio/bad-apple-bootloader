@@ -24,14 +24,14 @@ clean:
 
 # rules
 $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
-	cat $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin > $(BUILD_DIR)/$(EXECUTABLE)
+	cat $^ > $@
 
 $(BUILD_DIR)/code.bin: $(SRC_DIR)/$(SOURCE)
 	mkdir -p $(BUILD_DIR)
 
-	$(AS) $(ASFLAGS) $^ -o $(BUILD_DIR)/code.bin
+	$(AS) $(ASFLAGS) $^ -o $@
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	mkdir -p $(BUILD_DIR)
 
-	$(PYTHON) $(SRC_DIR)/vid2data/main.py $(VIDEO_PATH) -o $(BUILD_DIR)/data.bin
+	$(PYTHON) $(SRC_DIR)/vid2data/main.py $< -o $@
