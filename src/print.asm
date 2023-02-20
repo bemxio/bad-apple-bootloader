@@ -30,6 +30,20 @@ line_break:
     popa ; restore registers
     ret ; return from the function
 
+move_cursor:
+    pusha ; save registers
+
+    mov ah, 0x02 ; 'Set Cursor Position' function
+    mov bh, 0x00 ; page number, 0 by default
+
+    mov dl, 0x00 ; row value (top)
+    mov dh, 0x00 ; column value (left)
+    
+    int 0x10 ; BIOS interrupt
+    
+    popa ; restore registers
+    ret ; return from the function
+
 println:
     call print
     call line_break
