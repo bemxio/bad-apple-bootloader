@@ -1,20 +1,22 @@
+DISK_ADDRESS_PACKET:
+    db 0x10 ; size of the packet, 16 bytes by default
+    db 0x00 ; unused, should always be 0
+
+    dw FRAME_SIZE ; number of sectors to read
+    dw FRAME_OFFSET ; pointer to the buffer
+    dw 0x00 ; page number, 0 by default
+
+    BYTE_OFFSET: dd 0x00 ; offset of the sector to read (lower 32-bits)
+    dd 0x00 ; unused here (upper 32-bits)
+
 read_frame:
-    mov ah, 0x02 ; 'Read Sectors From Drive' function
-    mov al, FRAME_SIZE ; number of sectors to read
-
-    inc cl ; increment the sector value
-
-    cmp cl, 0x3F ; check if the sector value is 63
-    jnle last_sector ; if it's not less or equal to 63, increment the head value
-
-    mov ch, 0x00 ; set the cylinder value
+    mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
+    mov si, DISK_ADDRESS_PACKET ; load the address of the packet
 
     int 0x13 ; BIOS interrupt
     jc disk_error ; if carry flag is set, an error occurred
 
-    cmp al, FRAME_SIZE ; check if we read all sectors
-    jne sector_error ; if not, an error occurred
-
+    add dword [BYTE_OFFSET], FRAME_SIZE ; increment the offset
     ret ; return to caller
 
 last_sector:
