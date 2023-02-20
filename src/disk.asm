@@ -2,9 +2,12 @@ read_frame:
     mov ah, 0x02 ; 'Read Sectors From Drive' function
     mov al, FRAME_SIZE ; number of sectors to read
 
-    mov cl, 0x02 ; sector
-    mov ch, 0x00 ; cylinder
-    mov dh, 0x00 ; head
+    inc cl ; increment the sector value
+
+    cmp cl, 0x3F ; check if the sector value is 63
+    jnle last_sector ; if it's not less or equal to 63, increment the head value
+
+    mov ch, 0x00 ; set the cylinder value
 
     int 0x13 ; BIOS interrupt
     jc disk_error ; if carry flag is set, an error occurred
@@ -12,6 +15,11 @@ read_frame:
     cmp al, FRAME_SIZE ; check if we read all sectors
     jne sector_error ; if not, an error occurred
 
+    ret ; return to caller
+
+last_sector:
+    mov cl, 0x01 ; set the sector value
+    inc dh ; increment the head value
     ret ; return to caller
 
 disk_error:
@@ -22,7 +30,7 @@ disk_error:
 
 sector_error:
     mov bx, SECTOR_ERROR
-    call print
+    call println
 
     hlt ; halt the system
 
