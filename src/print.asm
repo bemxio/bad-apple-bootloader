@@ -36,8 +36,8 @@ move_cursor:
     mov ah, 0x02 ; 'Set Cursor Position' function
     mov bh, 0x00 ; page number, 0 by default
 
-    mov dl, 0x00 ; row value (top)
-    mov dh, 0x00 ; column value (left)
+    mov dl, 0x10 ; row value (top)
+    mov dh, 0x10 ; column value (left)
     
     int 0x10 ; BIOS interrupt
     

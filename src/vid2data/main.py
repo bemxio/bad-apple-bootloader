@@ -6,7 +6,7 @@ from pathlib import Path
 
 # constants
 BRIGHTNESS_THRESHOLD = 0.5
-TERMINAL_SIZE = (80, 24)
+TERMINAL_SIZE = (80, 25)
 
 LIGHT_CHARACTER = b"#"
 DARK_CHARACTER = b" "
@@ -33,7 +33,7 @@ def convert_to_binary(frame: Image.Image) -> bytes:
         else:
             data += DARK_CHARACTER
 
-    data += b"\0" * 128
+    data += b"\0" * 48
 
     return data
     

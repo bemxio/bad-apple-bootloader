@@ -19,11 +19,6 @@ read_frame:
     add dword [BYTE_OFFSET], FRAME_SIZE ; increment the offset
     ret ; return to caller
 
-last_sector:
-    mov cl, 0x01 ; set the sector value
-    inc dh ; increment the head value
-    ret ; return to caller
-
 disk_error:
     mov bx, DISK_ERROR
     call println ; print the error message
