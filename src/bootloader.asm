@@ -23,8 +23,8 @@ loop:
     call print ; print the frame
     
     ; debugging purposes
-    mov ah, 0x00 ; 'Read Character' function
-    int 0x16 ; call the BIOS interrupt
+    ;mov ah, 0x00 ; 'Read Character' function
+    ;int 0x16 ; call the BIOS interrupt
 
     inc cx ; increment the frame counter
     jmp loop ; infinite loop
