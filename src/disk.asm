@@ -6,7 +6,7 @@ DISK_ADDRESS_PACKET:
     dw FRAME_OFFSET ; pointer to the buffer
     dw 0x00 ; page number, 0 by default
 
-    BYTE_OFFSET: dd 0x00 ; offset of the sector to read (lower 32-bits)
+    BYTE_OFFSET: dd 0x01 ; offset of the sector to read (lower 32-bits)
     dd 0x00 ; unused here (upper 32-bits)
 
 read_frame:
