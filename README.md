@@ -30,7 +30,7 @@ and all of the needed packages will be installed. For Windows, you might need to
 Before building the bootloader, you will need to do a couple of things. 
 
 1. Download the video to be played. It can be anything you like, however grayscale videos work best. You can download the original Bad Apple video from [here](https://archive.org/details/TouhouBadApple).
-2. Open the `Makefile` and edit variables according to your configuration. The one you will most likely need to change is `VIDEO`, which should be set to the path of the video you downloaded in the previous step.
+2. Open the [`Makefile`](Makefile) and edit variables according to your configuration. The one you will most likely need to change is `VIDEO`, which should be set to the path of the video you downloaded in the previous step.
 3. Simply run `make` in the root directory of the project.
 
 This will build the bootloader in the `build/bootloader.bin` file.
