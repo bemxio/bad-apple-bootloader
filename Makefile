@@ -17,7 +17,7 @@ VIDEO_PATH = video.flv
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
 run: $(BUILD_DIR)/$(EXECUTABLE)
-	qemu-system-i386.exe -drive format=raw,file=$^
+	$(QEMU) -drive format=raw,file=$^
 
 clean:
 	rm -rf build
