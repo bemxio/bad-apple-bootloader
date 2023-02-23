@@ -20,7 +20,7 @@ run: $(BUILD_DIR)/$(EXECUTABLE)
 	qemu-system-i386.exe -drive format=raw,file=$^
 
 clean:
-	rm -rf build/code.bin build/bootloader.bin
+	rm -rf build
 
 # rules
 $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
