@@ -20,7 +20,7 @@ def get_filling_amount(size: int) -> int:
     while amount < size:
         amount += 512
 
-    return amount - size
+    return amount - size + 1
 
 def main(input_path: Path, output_path: Path, width: int = 80, height: int = 25):
     if not input_path.exists():
@@ -41,7 +41,7 @@ def main(input_path: Path, output_path: Path, width: int = 80, height: int = 25)
         if index == 1:
             length = video.source.frame_count
         
-        data += text.encode("utf-8") + filling
+        data += text.encode("utf-8")[:-1] + filling
 
         print(f"Frame {index}/{length} ({round(index / length * 100, 2)}%)", end="\r")
 
