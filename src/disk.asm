@@ -25,13 +25,5 @@ disk_error:
 
     hlt ; halt the system
 
-sector_error:
-    mov bx, SECTOR_ERROR
-    call println
-
-    hlt ; halt the system
-
 FRAME_SIZE equ 4 ; 4 sectors per frame
-
-DISK_ERROR: db "Disk read error", 0
-SECTOR_ERROR: db "Incorrect number of sectors read", 0
+DISK_ERROR: db "Encountered an error while trying to read the disk!", 0
