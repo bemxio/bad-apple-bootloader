@@ -25,5 +25,6 @@ disk_error:
 
     hlt ; halt the system
 
-FRAME_SIZE equ 4 ; 4 sectors per frame
+FRAME_SIZE equ 125 ; 125 sectors per frame
+
 DISK_ERROR: db "Encountered an error while trying to read the disk!", 0
