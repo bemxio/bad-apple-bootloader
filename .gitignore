@@ -1,7 +1,3 @@
-# Cache directories (Python)
-__pycache__/
-*.pyc
-
 # Video files
 *.mp4
 *.avi
@@ -10,8 +6,10 @@ __pycache__/
 *.flv
 *.webm
 
-# Binary files
+# Binary/executable files
 *.bin
+*.exe
+*.out
 
 # Build directory
 build/
