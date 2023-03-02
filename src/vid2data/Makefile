@@ -1,7 +1,7 @@
 # constants
 CXX = g++
-CXXFLAGS = -std=c++11 -O2 $(shell pkg-config --cflags opencv4)
-LIBS = $(shell pkg-config --libs opencv4)
+CXXFLAGS = -std=c++11 -O2
+LIBS = $(shell pkg-config --cflags --libs opencv4)
 
 SRC_DIR = .
 BUILD_DIR = ../../build
@@ -19,4 +19,4 @@ clean:
 $(BUILD_DIR)/$(EXECUTABLE): $(SRC_DIR)/$(SOURCE)
 	mkdir -p $(BUILD_DIR)
 
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
