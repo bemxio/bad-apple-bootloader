@@ -32,6 +32,4 @@ $(BUILD_DIR)/code.bin: $(SRC_DIR)/$(SOURCE)
 	$(AS) $(ASFLAGS) $^ -o $@
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
-	mkdir -p $(BUILD_DIR)
-
-	$(PYTHON) $(SRC_DIR)/vid2data/main.py $< -o $@
+	$(MAKE) -C $(SRC_DIR)/vid2data
