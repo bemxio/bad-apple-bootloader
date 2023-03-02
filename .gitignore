@@ -11,5 +11,8 @@
 *.exe
 *.out
 
+# Visual Studio Code
+.vscode/
+
 # Build directory
 build/

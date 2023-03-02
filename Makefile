@@ -33,3 +33,5 @@ $(BUILD_DIR)/code.bin: $(SRC_DIR)/$(SOURCE)
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	$(MAKE) -C $(SRC_DIR)/vid2data
+
+	./$(BUILD_DIR)/vid2data $^ $@
