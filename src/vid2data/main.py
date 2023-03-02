@@ -1,19 +1,9 @@
-from toascii import Video, GrayscaleConverter, ConverterOptions
-from toascii.gradients import OXXO
 import numpy as np
+import cv2
 
 from argparse import ArgumentParser
-from typing import Generator
 from pathlib import Path
 
-class CustomConverter(GrayscaleConverter):
-    def _asciify_image(self, image: np.ndarray) -> Generator[bytes, None, None]:
-        g_l_m = len(self.options.gradient) - 1
-
-        for row in image:
-            for b, g, r in row:
-                yield self.options.gradient[int((self._luminosity(r, g, b) / 255) * g_l_m)]
-            
 def get_filling_amount(size: int) -> int:
     amount = 0
 
@@ -22,26 +12,44 @@ def get_filling_amount(size: int) -> int:
 
     return amount - size + 1
 
+def process_frame(frame: np.array, width: int, height: int) -> bytes:
+    shades = [0b00, 0b01, 0b10, 0b11]
+    choices = 256 // len(shades)
+
+    data = b""
+
+    for row in range(height):
+        for column in range(width):
+            data += bytes(shades[frame[row, column] // choices])
+
+    return data + (b"\0" * get_filling_amount(width * height))
+        
 def main(input_path: Path, output_path: Path, width: int = 80, height: int = 25):
     if not input_path.exists():
         raise FileNotFoundError(f"input path `{input_path}` does not exist")
 
-    options = ConverterOptions(gradient=OXXO, width=width, height=height)
-    video = Video(str(input_path), converter=CustomConverter(options))
+    video = cv2.VideoCapture(str(input_path))
+    
+    if not video.isOpened():
+        raise RuntimeError(f"could not open video file `{input_path}`")
 
+    length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     size = width * height
-    filling = b"\0" * get_filling_amount(size)
 
-    print(f"Frame size: {size} bytes ({round(size / 512)} sectors, with {len(filling)} bytes of filling)")
+    print(f"Frame size: {size} bytes ({round(size / 512)} sectors)")
     print(f"Terminal size: {width}x{height} (width x height)")
-
+    print(f"Total frames: {length} ({round(length / 30, 2)} seconds")
+    
     data = b""
 
-    for index, text in enumerate(video.get_ascii_frames(), start=1):
-        if index == 1:
-            length = video.source.frame_count
-        
-        data += text.encode("utf-8")[:-1] + filling
+    for index in range(length):
+        success, frame = video.read()
+
+        if not success:
+            raise RuntimeError(f"failed to read frame #{index}")
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        data += process_frame(frame, width=width, height=height)
 
         print(f"Frame {index}/{length} ({round(index / length * 100, 2)}%)", end="\r")
 
@@ -53,7 +61,8 @@ if __name__ == "__main__":
 
     parser.add_argument("input_path", type=Path, help="The input path to the video file.")
     parser.add_argument("--output_path", "-o", type=Path, help="The output path to the data file.", default=Path("video.bin"))
-    parser.add_argument("--width", type=int, help="The width of the terminal.", default=80)
-    parser.add_argument("--height", type=int, help="The height of the terminal.", default=25)
+
+    parser.add_argument("--width", type=int, help="The width of the screen.", default=320)
+    parser.add_argument("--height", type=int, help="The height of the screen.", default=200)
 
     main(**vars(parser.parse_args()))
