@@ -49,9 +49,11 @@ Secondly, no one has done this before. As mentioned above, there is a GRUB versi
 The `bootloader.bin` file is split into two parts - the first one is the bootloader itself, with all of the code, and the second one is the video data. 
 The code reads each frame from the video data (for technical nerds, it uses LBA, using the "Extended Read Sectors From Drive" function) and displays it on the screen, by iterating over each character and calling an interrupt for each one.
 
+<!--
 ### Why is it so fast?
 The ["Wait"](http://www.ctyme.com/intr/rb-1525.htm) function didn't work and kept breaking disk reads, that's why as of now, I left it as it is. I might try to fix it in the future (from what I've searched so far, I will need to use interrupt handlers for that). 
 If you want to get closer to the original speed, you can uncomment the lines 26-27 in `src/bootloader.asm`. That will make the bootloader wait for keyboard input instead of jumping instantly. With that, you can just hold down any key, and the video will play at a speed closer to the original.
+-->
 
 ## Contributions
 Contributions are welcome, really welcome, in fact! If you want to contribute, whether it's just a simple question or a whole pull request, feel free to do so.
