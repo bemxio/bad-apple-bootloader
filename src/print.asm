@@ -67,4 +67,4 @@ slow_print:
     popa ; restore registers
     ret ; return from the function
 
-PRINT_REPETITION equ 8 ; the number of times a frame will be printed
+PRINT_REPETITION equ 7 ; the number of times a frame will be printed
