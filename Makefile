@@ -8,7 +8,7 @@ QEMU = qemu-system-i386.exe
 SRC_DIR = src
 BUILD_DIR = build
 
-SOURCE = bootloader.asm
+SOURCES = $(sort $(wildcard $(SRC_DIR)/*.asm))
 EXECUTABLE = bootloader.bin
 
 VIDEO_PATH = video.flv
@@ -26,10 +26,10 @@ clean:
 $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
 	cat $^ > $@
 
-$(BUILD_DIR)/code.bin: $(SRC_DIR)/$(SOURCE)
+$(BUILD_DIR)/code.bin: $(SOURCES)
 	mkdir -p $(BUILD_DIR)
 
-	$(AS) $(ASFLAGS) $^ -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	mkdir -p $(BUILD_DIR)
