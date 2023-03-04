@@ -49,3 +49,22 @@ println:
     call line_break
 
     ret
+
+slow_print:
+    pusha ; save registers
+
+    mov cl, 0x00 ; set the counter to 0
+
+    slow_print_loop:
+        call print ; print the string
+        call move_cursor ; move the cursor to the top left corner
+
+        inc cl ; increment the counter
+
+        cmp cl, PRINT_REPETITION ; check if the counter is equal to the repetition value
+        jne slow_print_loop ; if not, jump back to the start of the loop
+    
+    popa ; restore registers
+    ret ; return from the function
+
+PRINT_REPETITION equ 8 ; the number of times a frame will be printed

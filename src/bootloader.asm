@@ -19,8 +19,7 @@ loop:
     mov bx, FRAME_OFFSET ; set the frame offset in memory
 
     call read_frame ; read the first frame of the disk into memory
-    call move_cursor ; move the cursor to the top left corner
-    call print ; print the frame
+    call slow_print ; print the frame
     
     ; debugging purposes
     ;mov ah, 0x00 ; 'Read Character' function
