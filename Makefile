@@ -2,8 +2,8 @@
 AS = nasm
 ASFLAGS = -f bin
 
-PYTHON = python.exe
-QEMU = qemu-system-i386.exe
+PYTHON = python3
+QEMU = qemu-system-i386
 
 SRC_DIR = src
 BUILD_DIR = build
