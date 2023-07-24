@@ -50,21 +50,20 @@ println:
 
     ret
 
-slow_print:
+print_frame:
     pusha ; save registers
 
-    mov cl, 0x00 ; set the counter to 0
+    call print ; print the string
+    call move_cursor ; move the cursor to the top left corner
 
-    slow_print_loop:
-        call print ; print the string
-        call move_cursor ; move the cursor to the top left corner
+    mov ah, 0x86 ; change the interrupt mode to "Wait"
 
-        inc cl ; increment the counter
+    mov cx, 0x00 ; unused here (upper 16-bits)
+    mov dx, DELAY_TIME ; wait for `DELAY_TIME` microseconds (lower 16-bits)
 
-        cmp cl, PRINT_REPETITION ; check if the counter is equal to the repetition value
-        jne slow_print_loop ; if not, jump back to the start of the loop
-    
+    int 0x15 ; call the BIOS interrupt
+
     popa ; restore registers
     ret ; return from the function
 
-PRINT_REPETITION equ 3 ; the number of times a frame will be printed
+DELAY_TIME equ 0x2b67 ; the amount of time to wait between each frame (in microseconds)
