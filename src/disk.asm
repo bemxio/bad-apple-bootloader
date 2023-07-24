@@ -20,18 +20,16 @@ read_frame:
     ret ; return to caller
 
 disk_error:
-    mov bx, DISK_ERROR
-    call println ; print the error message
+    mov bx, DISK_ERROR ; load the address of the error message
+    mov cl, ah ; load the error code into the `cl` register
 
-    hlt ; halt the system
-
-sector_error:
-    mov bx, SECTOR_ERROR
-    call println
+    call print ; print the error message
+    call print_hex ; print the error code in hex
+    call line_break ; add a line break
 
     hlt ; halt the system
 
 FRAME_SIZE equ 4 ; 4 sectors per frame
 
-DISK_ERROR: db "Disk read error", 0
-SECTOR_ERROR: db "Incorrect number of sectors read", 0
+DISK_ERROR: db "error: disk read failed with code 0x", 0
+;SECTOR_ERROR: db "error: incorrect number of sectors read", 0

@@ -32,8 +32,10 @@ end:
     jmp $ ; infinite loop
 
 ; includes
-%include "./src/print.asm"
 %include "./src/disk.asm"
+%include "./src/print.asm"
+%include "./src/print_hex.asm"
 
 times 510 - ($ - $$) db 0 ; pad to 510 bytes
+
 dw 0xaa55 ; magic signature

@@ -44,12 +44,6 @@ move_cursor:
     popa ; restore registers
     ret ; return from the function
 
-println:
-    call print
-    call line_break
-
-    ret
-
 print_frame:
     pusha ; save registers
 
