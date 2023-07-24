@@ -33,7 +33,6 @@ end:
 
 ; includes
 %include "./src/print.asm"
-%include "./src/print_hex.asm"
 %include "./src/disk.asm"
 
 times 510 - ($ - $$) db 0 ; pad to 510 bytes
