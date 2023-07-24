@@ -36,6 +36,16 @@ Before building the bootloader, you will need to do a couple of things.
 This will build the bootloader in the `build/bootloader.bin` file.
 If you installed QEMU and want to run the bootloader, you can do so by running `make run` in the root directory of the project.
 
+### Troubleshooting
+
+#### `qemu-system-i386: -accel kvm: invalid accelerator kvm`
+By default, the Makefile uses KVM as an accelerator for QEMU. Since KVM is exclusive to Linux, you might need to change it to something else. If you are on Windows or macOS, you can comment the `QEMUFLAGS` variable altogether, the default one should work fine. If it doesn't work fine (runs really slowly), feel free to experiment with different accelerators (you can find a list of them [here](https://www.qemu.org/docs/master/system/introduction.html#virtualisation-accelerators)).
+
+#### It's too slow/fast and/or the frame rate is unstable!
+Sadly, it's really difficult to get the original speed of the video, since the CPU cannot keep a stable frame rate. If you want to get closer to the original speed, you can try to increase or decrease the `DELAY_TIME` value on line 63 in [`src/print.asm`](src/print.asm).
+
+In the future, I might implement something bigger, like a custom interrupt handler, to get a stable frame rate. But for now, playing around with the `DELAY_TIME` value is the only thing you can try to make it run more faithfully.
+
 ## FAQ
 
 ### Why?
