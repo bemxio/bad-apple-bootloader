@@ -3,7 +3,9 @@ AS = nasm
 ASFLAGS = -f bin
 
 PYTHON = python3
+
 QEMU = qemu-system-i386
+QEMUFLAGS = -accel kvm
 
 SRC_DIR = src
 BUILD_DIR = build
@@ -17,7 +19,7 @@ VIDEO_PATH = video.flv
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
 run: $(BUILD_DIR)/$(EXECUTABLE)
-	$(QEMU) -drive format=raw,file=$^
+	$(QEMU) $(QEMUFLAGS) -drive format=raw,file=$^ 
 
 clean:
 	rm -rf build
