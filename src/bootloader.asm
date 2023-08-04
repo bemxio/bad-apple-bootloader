@@ -7,6 +7,7 @@ FRAME_AMOUNT equ 6567 ; amount of frames on the disk
 ; set the video mode to 80x25 text mode
 mov ah, 0x00 ; 'Set Video Mode' function
 mov al, 0x03 ; 80x25 text mode
+
 int 0x10 ; call the BIOS interrupt
 
 ; variables for the main loop
@@ -36,6 +37,8 @@ end:
 %include "./src/print.asm"
 %include "./src/print_hex.asm"
 
-times 510 - ($ - $$) db 0 ; pad to 510 bytes
+; pad the rest of the sector with null bytes
+times 510 - ($ - $$) db 0
 
-dw 0xaa55 ; magic signature
+; set the magic number
+dw 0xaa55
