@@ -44,8 +44,8 @@ pit_handler:
 ; includes
 %include "./src/print.asm"
 %include "./src/print_hex.asm"
-%include "./src/disk.asm"
 %include "./src/pit.asm"
+%include "./src/disk.asm"
 
 ; pad the rest of the sector with null bytes
 times 510 - ($ - $$) db 0
