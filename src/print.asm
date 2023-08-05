@@ -43,21 +43,3 @@ move_cursor:
     
     popa ; restore registers
     ret ; return from the function
-
-print_frame:
-    pusha ; save registers
-
-    call print ; print the string
-    call move_cursor ; move the cursor to the top left corner
-
-    mov ah, 0x86 ; change the interrupt mode to "Wait"
-
-    mov cx, 0x00 ; unused here (upper 16-bits)
-    mov dx, DELAY_TIME ; wait for `DELAY_TIME` microseconds (lower 16-bits)
-
-    int 0x15 ; call the BIOS interrupt
-
-    popa ; restore registers
-    ret ; return from the function
-
-DELAY_TIME equ 0x2b67 ; the amount of time to wait between each frame (in microseconds)

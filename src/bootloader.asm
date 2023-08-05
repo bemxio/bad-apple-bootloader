@@ -13,29 +13,39 @@ int 0x10 ; call the BIOS interrupt
 ; variables for the main loop
 mov cx, 0 ; set the frame counter to 0
 
-loop:
+; set the interrupt handler
+cli ; disable interrupts
+
+call setup_pit ; set up the PIT (Programmable Interval Timer)
+call setup_ivt ; add the handler entry to the IVT (Interrupt Vector Table)
+
+sti ; re-enable interrupts
+
+loop_forever:
+    jmp $ ; jump to the current address (thus, making an infinite loop)
+
+pit_handler:
     cmp cx, FRAME_AMOUNT ; check if the frame counter is equal to the amount of frames on the disk
-    je end ; if so, jump to the end of the program
+    je loop_forever ; if so, jump to the infinite loop
 
     mov bx, FRAME_OFFSET ; set the frame offset in memory
 
     call read_frame ; read the first frame of the disk into memory
-    call print_frame ; print the frame
-    
-    ; debugging purposes
-    ;mov ah, 0x00 ; 'Read Character' function
-    ;int 0x16 ; call the BIOS interrupt
+    call print ; print the frame to the screen
+    call move_cursor ; move the cursor to the top left corner
 
     inc cx ; increment the frame counter
-    jmp loop ; infinite loop
 
-end:
-    jmp $ ; infinite loop
+    mov al, 0x20 ; set the EOI (End Of Interrupt) signal
+    out 0x20, al ; send it to the PIC
+
+    iret ; return from the interrupt
 
 ; includes
-%include "./src/disk.asm"
 %include "./src/print.asm"
 %include "./src/print_hex.asm"
+%include "./src/disk.asm"
+%include "./src/pit.asm"
 
 ; pad the rest of the sector with null bytes
 times 510 - ($ - $$) db 0

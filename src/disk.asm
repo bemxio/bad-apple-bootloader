@@ -1,3 +1,5 @@
+FRAME_SIZE equ 4 ; 4 sectors per frame
+
 DISK_ADDRESS_PACKET:
     db 0x10 ; size of the packet, 16 bytes by default
     db 0x00 ; unused, should always be 0
@@ -24,12 +26,10 @@ disk_error:
     mov cl, ah ; load the error code into the `cl` register
 
     call print ; print the error message
+
     call print_hex ; print the error code in hex
     call line_break ; add a line break
 
     hlt ; halt the system
 
-FRAME_SIZE equ 4 ; 4 sectors per frame
-
 DISK_ERROR: db "error: disk read failed with code 0x", 0
-;SECTOR_ERROR: db "error: incorrect number of sectors read", 0
