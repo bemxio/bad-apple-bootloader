@@ -2,6 +2,8 @@
 A bootloader, specifically made for playing [Bad Apple](https://www.youtube.com/watch?v=UkgK8eUdpAo).
 Inspired by the [GRUB](https://github.com/noeamiot/Bad-Apple-on-GRUB) version, and my urge for low-level programming.
 
+Check out the video [here](https://www.youtube.com/watch?v=eKCEhFYnbD8)!
+
 ## Usage
 To build the bootloader in the easiest way, just follow the instructions below.
 
@@ -61,7 +63,7 @@ There are two main reasons for this project:
 
 Firstly, I wanted to learn more about low-level programming, more specifically Assembly. I already made [an operating system](https://github.com/bemxio/bemxos), however, the Assembly side has attracted me the most. I wanted to challenge myself into using it for something bigger, in order to properly learn registers, interrupts and things like that. Perhaps, in the future, I will step into NES development!
 
-Secondly, no one has done this before. As mentioned above, there is a GRUB version of it, but I wanted to make it from scratch, with bare Assembly, keeping it as minimal as possible. I also wanted to make it as easy to use as possible, so that anyone can put their own video in and build it.
+~~Secondly, no one has done this before.~~ Actually, I was wrong. [@redstone_flash5774](https://www.youtube.com/channel/UCxL3ay5lRA4KvCX56sRIUeA) made their version and uploaded it to YouTube [here](https://www.youtube.com/watch?v=DsJH3SNYqvM). I didn't notice it at all in those 6 months, just found it out when I was uploading my video on YouTube. Still, our approaches to do it are different, and they have not uploaded the source code, so I guess I can still be proud of it!
 
 ### How does it work?
 The `bootloader.bin` file is split into two parts - the first one is the bootloader itself, with all of the code, and the second one is the video data. 
