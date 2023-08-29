@@ -4,7 +4,7 @@ print:
     mov ah, 0x0e ; change the interrupt mode to "Teletype Output"
     mov bx, 0x00 ; set the page number and foreground color to 0
 
-    print_start:
+    print_loop:
         mov al, [bp] ; move the character at the base pointer into `al`
 
         cmp al, 0x00 ; check if the character is a null byte
@@ -13,7 +13,7 @@ print:
         int 0x10 ; call the BIOS interrupt
 
         inc bp ; increment the base pointer
-        jmp print_start ; jump back to the start of the loop
+        jmp print_loop ; jump back to the start of the loop
     
     print_end:
         popa ; restore registers
