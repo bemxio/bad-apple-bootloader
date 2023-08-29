@@ -22,7 +22,7 @@ read_frame:
     ret ; return to caller
 
 disk_error:
-    mov bx, DISK_ERROR ; load the address of the error message
+    mov bp, DISK_ERROR ; load the address of the error message
     mov cl, ah ; load the error code into the `cl` register
 
     call print ; print the error message

@@ -11,7 +11,7 @@ mov al, 0x03 ; 80x25 text mode
 int 0x10 ; call the BIOS interrupt
 
 ; variables for the main loop
-mov cx, 0 ; set the frame counter to 0
+mov cx, 0x00 ; set the frame counter to 0
 
 ; set the interrupt handler
 cli ; disable interrupts
@@ -28,7 +28,7 @@ pit_handler:
     cmp cx, FRAME_AMOUNT ; check if the frame counter is equal to the amount of frames on the disk
     je loop_forever ; if so, jump to the infinite loop
 
-    mov bx, FRAME_OFFSET ; set the frame offset in memory
+    mov bp, FRAME_OFFSET ; set the frame offset in memory
 
     call read_frame ; read the first frame of the disk into memory
     call print ; print the frame to the screen
