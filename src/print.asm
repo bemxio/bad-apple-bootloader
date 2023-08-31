@@ -21,6 +21,7 @@ print:
 
 line_break:
     pusha ; save registers
+
     mov ah, 0x0e ; change the interrupt mode to "Teletype Output"
     
     mov al, 0x0a ; move the line feed character into `al`

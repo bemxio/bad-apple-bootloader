@@ -1,7 +1,7 @@
 [bits 16] ; 16-bit code
 [org 0x7c00] ; bootloader offset
 
-FRAME_OFFSET equ 0x1000 ; offset of the frame in memory
+FRAME_ADDRESS equ 0x7e00 ; address for the frame in memory
 FRAME_AMOUNT equ 6567 ; amount of frames on the disk
 
 ; set the video mode to 80x25 text mode
@@ -28,7 +28,7 @@ pit_handler:
     cmp cx, FRAME_AMOUNT ; check if the frame counter is equal to the amount of frames on the disk
     je loop_forever ; if so, jump to the infinite loop
 
-    mov bp, FRAME_OFFSET ; set the frame offset in memory
+    mov bp, FRAME_ADDRESS ; set the frame offset in memory
 
     call read_frame ; read the first frame of the disk into memory
     call print ; print the frame to the screen
