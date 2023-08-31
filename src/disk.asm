@@ -32,4 +32,4 @@ disk_error:
 
     hlt ; halt the system
 
-DISK_ERROR: db "error: disk read failed with code 0x", 0
+DISK_ERROR: db "error: disk read failed with code 0x", 0x00

@@ -3,7 +3,7 @@ print_hex:
 
     ; convert the high nibble to ASCII character
     mov ch, cl ; copy the value to convert
-    shr ch, 4 ; shift the value 4 bits to the right
+    shr ch, 0x04 ; shift the value 4 bits to the right
 
     call print_hex_conversion ; convert and print the high nibble
 
@@ -19,10 +19,10 @@ print_hex:
     print_hex_conversion:
         add ch, '0' ; convert value to ASCII character
 
-        cmp ch, '9' ; check if the value is less or equal to '9'
+        cmp ch, '9' ; check if the value is less or equal to the ASCII character '9'
         jle print_hex_digit ; if it is, jump to print_hex_digit
 
-        add ch, 7 ; adjust the value to convert to the correct ASCII character
+        add ch, 0x07 ; adjust the value to convert to the correct ASCII character
 
     print_hex_digit:
         mov al, ch ; move the value to convert to the right register
