@@ -13,7 +13,7 @@ class CustomConverter(GrayscaleConverter):
         for row in image:
             for b, g, r in row:
                 yield self.options.gradient[int((self._luminosity(r, g, b) / 255) * g_l_m)]
-            
+
 def get_filling_amount(size: int) -> int:
     amount = 0
 
@@ -40,7 +40,7 @@ def main(input_path: Path, output_path: Path, width: int = 80, height: int = 25)
     for index, text in enumerate(video.get_ascii_frames(), start=1):
         if index == 1:
             length = video.source.frame_count
-        
+
         data += text.encode("utf-8")[:-1] + filling
 
         print(f"Frame {index}/{length} ({round(index / length * 100, 2)}%)", end="\r")
