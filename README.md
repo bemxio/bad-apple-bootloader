@@ -44,9 +44,7 @@ If you installed QEMU and want to run the bootloader, you can do so by running `
 By default, the Makefile uses KVM as an accelerator for QEMU. Since KVM is exclusive to Linux, you might need to change it to something else. If you are on Windows or macOS, you can comment the `QEMUFLAGS` variable altogether, the default one should work fine. If it doesn't work fine (runs really slowly), feel free to experiment with different accelerators (you can find a list of them [here](https://www.qemu.org/docs/master/system/introduction.html#virtualisation-accelerators)).
 
 #### It's too slow/fast and/or the frame rate is unstable!
-~~Sadly, it's really difficult to get the original speed of the video, since the CPU cannot keep a stable frame rate. If you want to get closer to the original speed, you can try to increase or decrease the `DELAY_TIME` value on line 63 in [`src/print.asm`](src/print.asm).~~
-
-~~In the future, I might implement something bigger, like a custom interrupt handler, to get a stable frame rate. But for now, playing around with the `DELAY_TIME` value is the only thing you can try to make it run more faithfully.~~
+~~In the future, I might implement something bigger, like a custom interrupt handler, to get a stable frame rate.~~
 
 After like a month or maybe even more, I finally understood how to set up the PIT and add a handler in the IVT, thus, the framerate is now fully faithful to the original! If it's still going too slow/fast though, you might need to adjust the `PIT_RELOAD_VALUE` value on line 2 in [`src/pit.asm`](src/pit.asm).
 
@@ -67,7 +65,7 @@ Firstly, I wanted to learn more about low-level programming, more specifically A
 
 ### How does it work?
 The `bootloader.bin` file is split into two parts - the first one is the bootloader itself, with all of the code, and the second one is the video data. 
-The code reads each frame from the video data (for technical nerds, it uses LBA, using the "Extended Read Sectors From Drive" function) and displays it on the screen, by iterating over each character and calling an interrupt for each one.
+The code reads each frame from the video data and displays it on the screen, by iterating over each character and calling an interrupt for each one.
 
 ## Contributions
 Contributions are welcome, really welcome, in fact! If you want to contribute, whether it's just a simple question or a whole pull request, feel free to do so.
