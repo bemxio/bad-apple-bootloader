@@ -15,6 +15,9 @@ EXECUTABLE = bootloader.bin
 
 VIDEO_PATH = video.flv
 
+FPS = $(shell ffmpeg -i $(VIDEO_PATH) 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
+RELOAD_VALUE = $(shell expr 1193182 / $(FPS))
+
 ASCII_GRADIENT = oxxo
 
 # targets
@@ -33,10 +36,9 @@ $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
 $(BUILD_DIR)/code.bin: $(SOURCES)
 	mkdir -p $(BUILD_DIR)
 
-	$(AS) $(ASFLAGS) $< -o $@
+	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) $< -o $@
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	mkdir -p $(BUILD_DIR)
 
-	$(PYTHON) $(SRC_DIR)/converter/main.py $< -o $@ \
-		--gradient $(ASCII_GRADIENT)
+	$(PYTHON) $(SRC_DIR)/converter/main.py --gradient $(ASCII_GRADIENT) $< -o $@
