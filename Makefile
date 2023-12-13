@@ -15,6 +15,8 @@ EXECUTABLE = bootloader.bin
 
 VIDEO_PATH = video.flv
 
+ASCII_GRADIENT = oxxo
+
 # targets
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
@@ -36,4 +38,5 @@ $(BUILD_DIR)/code.bin: $(SOURCES)
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	mkdir -p $(BUILD_DIR)
 
-	$(PYTHON) $(SRC_DIR)/vid2data/main.py $< -o $@
+	$(PYTHON) $(SRC_DIR)/converter/main.py $< -o $@ \
+		--gradient $(ASCII_GRADIENT)
