@@ -12,12 +12,12 @@ You can do it the manual way with an assembler, a video to ASCII converter and a
 ### Installing dependencies
 For Windows, you can install [Scoop](https://scoop.sh/) and run:
 ```powershell
-scoop install nasm make ffmpeg python
+scoop install nasm make mediainfo python
 ```
 
 As for Linux, all of the packages should be in your default package manager. Here's an example for Ubuntu:
 ```bash
-sudo apt install nasm make ffmpeg python3
+sudo apt install nasm make mediainfo python3
 ```
 
 If you want to run the bootloader, you need to install QEMU as well, which can be done with either `scoop install qemu` or `sudo apt install qemu`, depending on your operating system.

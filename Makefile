@@ -15,7 +15,7 @@ EXECUTABLE = bootloader.bin
 
 VIDEO_PATH = video.flv
 
-FPS = $(shell ffmpeg -i $(VIDEO_PATH) 2>&1 | sed -n "s/.*, \(.*\) fp.*/\1/p")
+FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 RELOAD_VALUE = $(shell expr 1193182 / $(FPS))
 
 ASCII_GRADIENT = oxxo
