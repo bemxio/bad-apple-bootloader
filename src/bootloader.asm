@@ -2,7 +2,7 @@
 [org 0x7c00] ; bootloader offset
 
 FRAME_ADDRESS equ 0x7e00 ; address for the frame in memory
-FRAME_AMOUNT equ 6567 ; amount of frames on the disk
+;FRAME_AMOUNT equ 6567 ; amount of frames on the disk
 
 ; set the video mode to 80x25 text mode
 mov ah, 0x00 ; 'Set Video Mode' function

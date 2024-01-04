@@ -16,6 +16,7 @@ EXECUTABLE = bootloader.bin
 VIDEO_PATH = video.flv
 
 FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
+FRAME_COUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $(shell expr 1193182 / $(FPS))
 
 ASCII_GRADIENT = oxxo
@@ -36,7 +37,7 @@ $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
 $(BUILD_DIR)/code.bin: $(SOURCES)
 	mkdir -p $(BUILD_DIR)
 
-	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) $< -o $@
+	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_COUNT) $< -o $@
 
 $(BUILD_DIR)/data.bin: $(VIDEO_PATH)
 	mkdir -p $(BUILD_DIR)
