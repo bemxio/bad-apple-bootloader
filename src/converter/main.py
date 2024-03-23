@@ -26,7 +26,7 @@ class CustomConverter(GrayscaleConverter):
 
 def main(input_path: Path, output_path: Path, gradient: str = "oxxo", width: int = 80, height: int = 25):
     if not input_path.exists():
-        raise FileNotFoundError(f"Input path `{input_path}` does not exist")
+        raise FileNotFoundError(f"Input path `{input_path}` does not exist.")
 
     options = ConverterOptions(gradient=GRADIENTS[gradient], width=width, height=height)
     video = Video(str(input_path), converter=CustomConverter(options))
@@ -47,7 +47,7 @@ def main(input_path: Path, output_path: Path, gradient: str = "oxxo", width: int
             print(f"Frame {index}/{length} ({round(index / length * 100, 2)}%)", end="\r")
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="A script for converting videos to an ASCII stream (for use with the bootloader)")
+    parser = ArgumentParser(description="A script for converting videos to an ASCII stream (for use with the bootloader).")
 
     parser.add_argument("input_path", type=Path, help="The input path to the video file.")
     parser.add_argument("--output_path", "-o", type=Path, help="The output path to the data file.", default=Path("video.bin"))
