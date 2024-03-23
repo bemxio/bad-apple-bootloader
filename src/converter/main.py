@@ -1,10 +1,10 @@
+import numpy as np
+from argparse import ArgumentParser
+from pathlib import Path
+from typing import Generator
+
 from toascii import Video, GrayscaleConverter, ConverterOptions
 from toascii.gradients import BLOCK, HIGH, LOW, OXXO
-import numpy as np
-
-from argparse import ArgumentParser
-from typing import Generator
-from pathlib import Path
 
 GRADIENTS = {
     "block": BLOCK,
@@ -14,16 +14,19 @@ GRADIENTS = {
 }
 
 class CustomConverter(GrayscaleConverter):
-    def _asciify_image(self, image: np.ndarray) -> Generator[bytes, None, None]:
-        g_l_m = len(self.options.gradient) - 1
+    def __init__(self, options):
+        super().__init__(options)
+        self.gradient = options.gradient
+        self.g_l_m = len(self.gradient) - 1
 
+    def _asciify_image(self, image: np.ndarray) -> Generator[bytes, None, None]:
         for row in image:
             for b, g, r in row:
-                yield self.options.gradient[int((self._luminosity(r, g, b) / 255) * g_l_m)]
+                yield self.gradient[int((self._luminosity(r, g, b) / 255) * self.g_l_m)]
 
 def main(input_path: Path, output_path: Path, gradient: str = "oxxo", width: int = 80, height: int = 25):
     if not input_path.exists():
-        raise FileNotFoundError(f"input path `{input_path}` does not exist")
+        raise FileNotFoundError(f"Input path `{input_path}` does not exist")
 
     options = ConverterOptions(gradient=GRADIENTS[gradient], width=width, height=height)
     video = Video(str(input_path), converter=CustomConverter(options))
@@ -34,19 +37,14 @@ def main(input_path: Path, output_path: Path, gradient: str = "oxxo", width: int
     print(f"Frame size: {size} bytes ({round(size / 512)} sectors, with {filling} bytes of filling)")
     print(f"Terminal size: {width}x{height} (width x height)")
 
-    data = b""
-
-    for index, text in enumerate(video.get_ascii_frames(), start=1):
-        if index == 1:
-            length = video.source.frame_count
-
-        data += text.encode("utf-8")[:-1] + (b"\0" * filling)
-
-        print(f"Frame {index}/{length}", end=" ")
-        print(f"({round(index / length * 100, 2)}%)", end="\r")
-
     with open(output_path, "wb") as file:
-        file.write(data)
+        for index, text in enumerate(video.get_ascii_frames(), start=1):
+            if index == 1:
+                length = video.source.frame_count
+            # Encode text to bytes, slice the last newline character, and add filler bytes
+            data = text.encode("utf-8")[:-1] + (b"\0" * filling)
+            file.write(data)
+            print(f"Frame {index}/{length} ({round(index / length * 100, 2)}%)", end="\r")
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="A script for converting videos to an ASCII stream (for use with the bootloader)")
@@ -59,4 +57,5 @@ if __name__ == "__main__":
     parser.add_argument("--width", type=int, help="The width of the terminal.", default=80)
     parser.add_argument("--height", type=int, help="The height of the terminal.", default=25)
 
-    main(**vars(parser.parse_args()))
+    args = parser.parse_args()
+    main(args.input_path, args.output_path, args.gradient, args.width, args.height)
