@@ -1,54 +1,45 @@
-[bits 16] ; 16-bit code
-[org 0x7c00] ; bootloader offset
+[bits 16]
+[org 0x7c00]
 
-FRAME_ADDRESS equ 0x7e00 ; address for the frame in memory
-;FRAME_AMOUNT equ 6567 ; amount of frames on the disk
+FRAME_ADDRESS equ 0x7e00
+;FRAME_AMOUNT equ 6567
 
-; set the video mode to 80x25 text mode
-mov ah, 0x00 ; 'Set Video Mode' function
-mov al, 0x03 ; 80x25 text mode
+    cli                     ; Disable interrupts
 
-int 0x10 ; call the BIOS interrupt
+    mov ax, 0x03            ; Set Video Mode 80x25 text mode
+    int 0x10
 
-; variables for the main loop
-mov cx, 0x00 ; set the frame counter to 0
+    mov cx, 0x0000          ; Frame counter
 
-; set the interrupt handler
-cli ; disable interrupts
+    call setup_pit          ; Set up Programmable Interval Timer
+    call setup_ivt          ; Set up Interrupt Vector Table
 
-call setup_pit ; set up the PIT (Programmable Interval Timer)
-call setup_ivt ; add the handler entry to the IVT (Interrupt Vector Table)
+    sti                     ; Re-enable interrupts
 
-sti ; re-enable interrupts
+.loop_forever:
+    jmp .loop_forever       ; Infinite loop
 
-loop_forever:
-    jmp $ ; jump to the current address (thus, making an infinite loop)
+.pit_handler:
+    cmp cx, FRAME_AMOUNT    ; Check frame counter against frame amount
+    je .loop_forever        ; Jump if equal
 
-pit_handler:
-    cmp cx, FRAME_AMOUNT ; check if the frame counter is equal to the amount of frames on the disk
-    je loop_forever ; if so, jump to the infinite loop
+    mov bp, FRAME_ADDRESS  ; Set frame offset in memory
 
-    mov bp, FRAME_ADDRESS ; set the frame offset in memory
+    call read_frame        ; Read frame into memory
+    call print             ; Print frame to the screen
+    call move_cursor       ; Move cursor to top left corner
 
-    call read_frame ; read the first frame of the disk into memory
-    call print ; print the frame to the screen
-    call move_cursor ; move the cursor to the top left corner
+    inc cx                 ; Increment frame counter
 
-    inc cx ; increment the frame counter
+    mov al, 0x20           ; Send EOI signal
+    out 0x20, al
 
-    mov al, 0x20 ; set the EOI (End Of Interrupt) signal
-    out 0x20, al ; send it to the PIC
+    iret                   ; Return from interrupt
 
-    iret ; return from the interrupt
-
-; includes
 %include "./src/print.asm"
 %include "./src/print_hex.asm"
 %include "./src/pit.asm"
 %include "./src/disk.asm"
 
-; pad the rest of the sector with null bytes
 times 510 - ($ - $$) db 0
-
-; set the magic number
 dw 0xaa55
