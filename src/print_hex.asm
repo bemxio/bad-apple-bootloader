@@ -1,33 +1,25 @@
-print_hex:  
-    pusha ; save all of the registers to the stack
+print_hex:
+    pusha                 ; Save all registers to the stack
 
-    ; convert the high nibble to ASCII character
-    mov ch, cl ; copy the value to convert
-    shr ch, 0x04 ; shift the value 4 bits to the right
+    mov ch, cl            ; Copy the value to convert
+    shr ch, 0x04          ; Shift the value 4 bits to the right
+    call print_hex_digit  ; Convert and print the high nibble
 
-    call print_hex_conversion ; convert and print the high nibble
+    mov ch, cl            ; Copy the value to convert
+    and ch, 0x0f          ; Mask out the low nibble
+    call print_hex_digit  ; Convert and print the low nibble
 
-    ; convert the low nibble to ASCII character
-    mov ch, cl ; copy the value to convert
-    and ch, 0x0f ; mask out the low nibble
+    popa                  ; Restore registers
+    ret                   ; Return from the function
 
-    call print_hex_conversion ; convert and print the low nibble
+print_hex_digit:
+    add ch, '0'           ; Convert value to ASCII character
+    cmp ch, '9'           ; Check if the value is less than or equal to '9'
+    jle print_hex_char    ; If so, jump to printing the character
+    add ch, 0x07          ; Adjust value to convert to correct ASCII character
 
-    popa ; restore registers
-    ret ; return from the function
-
-    print_hex_conversion:
-        add ch, '0' ; convert value to ASCII character
-
-        cmp ch, '9' ; check if the value is less or equal to the ASCII character '9'
-        jle print_hex_digit ; if it is, jump to print_hex_digit
-
-        add ch, 0x07 ; adjust the value to convert to the correct ASCII character
-
-    print_hex_digit:
-        mov al, ch ; move the value to convert to the right register
-
-        mov ah, 0x0e ; change the interrupt mode to "Teletype Output"
-        int 0x10 ; call the BIOS interrupt
-
-        ret ; return from the function
+print_hex_char:
+    mov al, ch            ; Move the value to convert to the right register
+    mov ah, 0x0e          ; Set the interrupt mode to "Teletype Output"
+    int 0x10              ; Call the BIOS interrupt
+    ret                   ; Return from the function
