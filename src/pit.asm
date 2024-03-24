@@ -1,5 +1,5 @@
 IVT_IRQ0_OFFSET equ 0x0020 ; the offset of the first IRQ in the IVT
-PIT_RELOAD_VALUE equ 39772 ; the reload value for the PIT (0x9b5c, 39772, results in 30 hz/FPS)
+;PIT_RELOAD_VALUE equ 39772 ; the reload value for the PIT (0x9b5c, 39772, results in 30 hz/FPS)
 
 setup_pit:
     pusha                   ; save the registers
@@ -9,6 +9,7 @@ setup_pit:
 
     mov ax, PIT_RELOAD_VALUE ; set the reload value
     out 0x40, al            ; send the low byte to the PIT
+
     mov al, ah              ; move the high byte to the low byte
     out 0x40, al            ; send the high byte to the PIT
 

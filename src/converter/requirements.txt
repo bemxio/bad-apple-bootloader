@@ -1,1 +1,2 @@
-to-ascii==6.0.1
+to-ascii
+numpy
