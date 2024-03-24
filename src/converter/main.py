@@ -43,7 +43,7 @@ def main(input_path: Path, output_path: Path, gradient: str = "oxxo", width: int
             if index == 1:
                 length = video.source.frame_count
 
-            # Encode text to bytes, slice the last newline character, and add filler bytes
+            # Encode text to bytes, slice the last character, and add filler bytes
             file.write(text.encode("utf-8")[:-1] + (b"\0" * filling))
 
             # Print progress
