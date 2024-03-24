@@ -14,12 +14,16 @@ print_hex:
 
 print_hex_digit:
     add ch, '0'           ; Convert value to ASCII character
+
     cmp ch, '9'           ; Check if the value is less than or equal to '9'
     jle print_hex_char    ; If so, jump to printing the character
+
     add ch, 0x07          ; Adjust value to convert to correct ASCII character
 
 print_hex_char:
     mov al, ch            ; Move the value to convert to the right register
     mov ah, 0x0e          ; Set the interrupt mode to "Teletype Output"
+
     int 0x10              ; Call the BIOS interrupt
+
     ret                   ; Return from the function

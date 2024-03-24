@@ -4,24 +4,24 @@
 FRAME_ADDRESS equ 0x7e00
 ;FRAME_AMOUNT equ 6567
 
-    cli                     ; Disable interrupts
+cli                     ; Disable interrupts
 
-    mov ax, 0x03            ; Set Video Mode 80x25 text mode
-    int 0x10
+mov ax, 0x03            ; Set Video Mode 80x25 text mode
+int 0x10
 
-    mov cx, 0x0000          ; Frame counter
+xor cx, cx              ; Reset frame counter
 
-    call setup_pit          ; Set up Programmable Interval Timer
-    call setup_ivt          ; Set up Interrupt Vector Table
+call setup_pit          ; Set up Programmable Interval Timer
+call setup_ivt          ; Set up Interrupt Vector Table
 
-    sti                     ; Re-enable interrupts
+sti                     ; Re-enable interrupts
 
-.loop_forever:
-    jmp .loop_forever       ; Infinite loop
+loop_forever:
+    jmp loop_forever       ; Infinite loop
 
-.pit_handler:
+pit_handler:
     cmp cx, FRAME_AMOUNT    ; Check frame counter against frame amount
-    je .loop_forever        ; Jump if equal
+    je loop_forever        ; Jump if equal
 
     mov bp, FRAME_ADDRESS  ; Set frame offset in memory
 
@@ -42,4 +42,5 @@ FRAME_ADDRESS equ 0x7e00
 %include "./src/disk.asm"
 
 times 510 - ($ - $$) db 0
+
 dw 0xaa55
