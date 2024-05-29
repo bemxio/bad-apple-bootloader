@@ -44,6 +44,8 @@ int main(int argc, char** argv) {
     uint8_t data[size];
     uint8_t pixel;
 
+    capture.set(cv::CAP_PROP_POS_FRAMES, 1000);
+
     for (int index = 1; index <= length; index++) {
         capture >> frame;
 
