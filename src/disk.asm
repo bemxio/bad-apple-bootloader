@@ -32,7 +32,7 @@ read_frame:
     mov ah, 0x02 ; "Read Sectors From Drive" mode
     mov al, FRAME_SIZE ; set the number of sectors to read
 
-    xor bx, bx ; clear the `bx` register
+    xor bx, bx ; clear the register storing the address
 
     mov es, bx ; set the segment to read to (always 0)
     mov bx, FRAME_ADDRESS ; set the address to read to
