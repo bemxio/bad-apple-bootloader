@@ -19,8 +19,6 @@ FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_COUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $(shell expr 1193182 / $(FPS))
 
-ASCII_GRADIENT = oxxo
-
 # targets
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
@@ -34,12 +32,11 @@ clean:
 $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
 	cat $^ > $@
 
-$(BUILD_DIR)/code.bin: $(SOURCES)
-	mkdir -p $(BUILD_DIR)
-
+$(BUILD_DIR)/code.bin: $(SOURCES) | $(BUILD_DIR)
 	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_COUNT) $< -o $@
 
-$(BUILD_DIR)/data.bin: $(VIDEO_PATH)
-	mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/data.bin: $(VIDEO_PATH) | $(BUILD_DIR)
+	$(PYTHON) $(SRC_DIR)/converter.py $< -o $@
 
-	$(PYTHON) $(SRC_DIR)/converter/main.py --gradient $(ASCII_GRADIENT) $< -o $@
+$(BUILD_DIR):
+	mkdir -p $@
