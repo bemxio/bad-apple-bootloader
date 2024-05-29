@@ -1,4 +1,8 @@
 # constants
+CXX = g++
+CXXFLAGS = -O2
+CXXLIBS = -I/usr/include/opencv4 -lopencv_videoio -lopencv_imgproc -lopencv_core
+
 AS = nasm
 ASFLAGS = -f bin
 
@@ -35,8 +39,11 @@ $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/code.bin $(BUILD_DIR)/data.bin
 $(BUILD_DIR)/code.bin: $(SOURCES) | $(BUILD_DIR)
 	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_COUNT) $< -o $@
 
-$(BUILD_DIR)/data.bin: $(VIDEO_PATH) | $(BUILD_DIR)
-	$(PYTHON) $(SRC_DIR)/converter.py $< -o $@
+$(BUILD_DIR)/data.bin: $(VIDEO_PATH) $(BUILD_DIR)/converter | $(BUILD_DIR)
+	$(BUILD_DIR)/converter $< $@
+
+$(BUILD_DIR)/converter: $(SRC_DIR)/converter.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXLIBS) $(CXXFLAGS) $< -o $@
 
 $(BUILD_DIR):
 	mkdir -p $@
