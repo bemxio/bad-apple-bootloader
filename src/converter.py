@@ -24,7 +24,7 @@ def main(input_path: Path, output_path: Path, screen_width: int, screen_height: 
     index = 1
     success = True
     
-    video.set(cv2.CAP_PROP_POS_FRAMES, 1000)
+    #video.set(cv2.CAP_PROP_POS_FRAMES, 1000)
 
     for index in range(1, length + 1):
         success, frame = video.read()
