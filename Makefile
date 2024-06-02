@@ -9,7 +9,7 @@ ASFLAGS = -f bin
 PYTHON = python3
 
 QEMU = qemu-system-i386
-QEMUFLAGS = -accel kvm
+#QEMUFLAGS = -accel kvm
 
 SRC_DIR = src
 BUILD_DIR = build

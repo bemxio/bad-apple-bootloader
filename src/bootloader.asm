@@ -37,7 +37,7 @@ pit_handler:
     iret ; return from interrupt
 
 ; constants
-FRAME_ADDRESS equ 0x7e00 ; the address of the frame buffer
+FRAME_ADDRESS equ 0x8000 ; the address of the frame buffer
 
 ; includes
 %include "./src/graphics.asm"

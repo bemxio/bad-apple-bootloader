@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     if (!capture.isOpened()) {
         std::cerr << "Error: Could not open video file '" << input_path << "'" << std::endl; return 1;
     }
-    
+
     std::ofstream file(output_path, std::ios::out | std::ios::binary | std::ios::app);
 
     if (!file.is_open()) {
@@ -37,14 +37,14 @@ int main(int argc, char** argv) {
     size_t sectors = round(size / 512.0);
     size_t length = (size_t)capture.get(cv::CAP_PROP_FRAME_COUNT);
 
-    std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
-    std::cout << "Screen size: " << SCREEN_WIDTH << "x" << SCREEN_HEIGHT << " (width x height)" << std::endl;
-    std::cout << "Total frames: " << length << std::endl;
+    //std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
+    //std::cout << "Screen size: " << SCREEN_WIDTH << "x" << SCREEN_HEIGHT << " (width x height)" << std::endl;
+    //std::cout << "Total frames: " << length << std::endl;
 
     uint8_t data[size];
     uint8_t pixel;
 
-    capture.set(cv::CAP_PROP_POS_FRAMES, 1000);
+    //capture.set(cv::CAP_PROP_POS_FRAMES, 1000);
 
     for (int index = 1; index <= length; index++) {
         capture >> frame;
@@ -69,4 +69,4 @@ int main(int argc, char** argv) {
     }
 
     return 0;
-}   
+}
