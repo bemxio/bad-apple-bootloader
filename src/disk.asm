@@ -11,23 +11,23 @@ increment_address:
     add byte [SECTOR_OFFSET], FRAME_SIZE ; increment the offset
 
     cmp byte [SECTOR_OFFSET], SECTORS_PER_TRACK ; compare the offset to the number of sectors per track
-    jl check_head
+    jl check_head ; if less, check the head number
 
     sub byte [SECTOR_OFFSET], SECTORS_PER_TRACK ; subtract the number of sectors per track from the offset
     inc byte [HEAD_OFFSET] ; increment the head number
 
 check_head:
     cmp byte [HEAD_OFFSET], HEADS_PER_CYLINDER ; compare the head number to the number of heads per cylinder
-    jl end_increment
+    jl end_incrementation ; if less, we're done
 
     mov byte [HEAD_OFFSET], 0x00 ; reset the head number
     inc byte [CYLINDER_OFFSET] ; increment the cylinder number
 
-end_increment:
-    ret ; return to caller
+end_incrementation:
+    ret ; return from function
 
 read_frame:
-    pusha ; save the registers
+    pusha ; save registers
 
     mov ah, 0x02 ; 'Read Sectors From Drive' function
 
@@ -48,12 +48,12 @@ read_frame:
 
     call increment_address ; increment the address
 
-    popa ; restore the registers
-    ret ; return to caller
+    popa ; restore registers
+    ret ; return from function
 
 disk_error:
-    mov bp, DISK_ERROR ; load the address of the error message
-    mov cl, ah ; load the error code into the `cl` register
+    mov bp, DISK_ERROR_MESSAGE ; load the address of the error message
+    mov cl, ah ; load the error cod
 
     call print ; print the error message
     call print_hex ; print the error code in hex
@@ -61,4 +61,4 @@ disk_error:
 
     hlt ; halt the system
 
-DISK_ERROR: db "Error: Disk read failed with code 0x", 0x00
+DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00

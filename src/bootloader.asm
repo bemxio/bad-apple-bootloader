@@ -1,46 +1,49 @@
-[bits 16]
-[org 0x7c00]
+[bits 16] ; 16-bit mode
+[org 0x7c00] ; global offset
 
-FRAME_ADDRESS equ 0x7e00
-;FRAME_AMOUNT equ 6567
+FRAME_ADDRESS equ 0x7e00 ; the address in memory to read the frame to
+;FRAME_AMOUNT equ 6567 ; the amount of frames to read
 
-cli                     ; Disable interrupts
+cli ; disable interrupts
 
-mov ax, 0x03            ; Set Video Mode 80x25 text mode
-int 0x10
+mov ax, 0x03 ; 80x25 text mode
+int 0x10 ; call the BIOS interrupt
 
-xor cx, cx              ; Reset frame counter
+xor cx, cx ; clear frame counter
 
-call setup_pit          ; Set up Programmable Interval Timer
-call setup_ivt          ; Set up Interrupt Vector Table
+call setup_pit ; set up the Programmable Interval Timer
+call setup_ivt ; set up the Interrupt Vector Table
 
-sti                     ; Re-enable interrupts
+sti ; re-enable interrupts
 
 loop_forever:
-    jmp loop_forever       ; Infinite loop
+    jmp loop_forever ; loop forever
 
 pit_handler:
-    cmp cx, FRAME_AMOUNT    ; Check frame counter against frame amount
-    je loop_forever        ; Jump if equal
+    cmp cx, FRAME_AMOUNT ; compare frame counter to frame amount
+    je loop_forever ; if equal, loop forever
 
-    mov bp, FRAME_ADDRESS  ; Set frame offset in memory
+    mov si, FRAME_ADDRESS ; load the address of the frame
 
-    call read_frame        ; Read frame into memory
-    call print             ; Print frame to the screen
-    call move_cursor       ; Move cursor to top left corner
+    call read_frame ; read the frame from the disk
+    call print ; print the frame
+    call move_cursor ; move the cursor to the top of the screen
 
-    inc cx                 ; Increment frame counter
+    inc cx ; increment the frame counter
 
-    mov al, 0x20           ; Send EOI signal
-    out 0x20, al
+    mov al, 0x20 ; EOI signal
+    out 0x20, al ; send it to the PIT
 
-    iret                   ; Return from interrupt
+    iret ; return from interrupt
 
-%include "./src/print.asm"
-%include "./src/print_hex.asm"
-%include "./src/pit.asm"
-%include "./src/disk.asm"
+; includes
+%include "src/print.asm"
+%include "src/print_hex.asm"
+%include "src/pit.asm"
+%include "src/disk.asm"
 
-times 510 - ($ - $$) db 0
+; pad the rest of the sector with zeros
+times 510 - ($ - $$) db 0x00
 
+; boot signature
 dw 0xaa55

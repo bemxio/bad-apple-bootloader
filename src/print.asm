@@ -1,46 +1,46 @@
 print:
-    pusha                   ; Save registers
+    pusha ; save registers
 
-    mov ah, 0x0e            ; Set interrupt mode for Teletype Output
-    mov bx, 0x0000          ; Set page number and foreground color to 0
+    mov ah, 0x0e ; 'Teletype Output' function
+    xor bh, bh ; set page number to 0
 
-print_loop:
-    mov al, [bp]            ; Move the character at the base pointer into AL
+    print_loop:
+        mov al, [si] ; move the character from the source index to the register
 
-    test al, al             ; Test if the character is null
-    jz print_end            ; If null, end printing
+        test al, al ; check if the character is null
+        jz print_end ; if so, print is done
 
-    int 0x10                ; Call BIOS interrupt
+        int 0x10 ; call the BIOS interrupt
 
-    inc bp                  ; Increment the base pointer
-    jmp print_loop          ; Jump back to the start of the loop
+        inc si ; move to the next character
+        jmp print_loop ; repeat
 
-print_end:
-    popa                    ; Restore registers
-    ret                     ; Return from the function
+    print_end:
+        popa ; restore registers
+        ret ; return from function
 
 line_break:
-    pusha                   ; Save registers
+    pusha ; save registers
 
-    mov ah, 0x0e            ; Set interrupt mode for Teletype Output
+    mov ah, 0x0e ; 'Teletype Output' function
     
-    mov al, 0x0d            ; Move the carriage return character into AL
-    int 0x10                ; Call BIOS interrupt
+    mov al, 0x0d ; carriage return character
+    int 0x10 ; call the BIOS interrupt
 
-    mov al, 0x0a            ; Move the line feed character into AL
-    int 0x10                ; Call BIOS interrupt
+    mov al, 0x0a ; line feed character
+    int 0x10 ; call the BIOS interrupt
 
-    popa                    ; Restore registers
-    ret                     ; Return from the function
+    popa ; restore registers
+    ret ; return from function
 
 move_cursor:
-    pusha                   ; Save registers
+    pusha ; save registers
 
-    mov ah, 0x02            ; Set Cursor Position function
-    xor dh, dh              ; Clear DH (row)
-    xor dl, dl              ; Clear DL (column)
+    mov ah, 0x02 ; 'Set Cursor Position' function
+    xor dh, dh ; clear the row counter
+    xor dl, dl ; clear the column counter
     
-    int 0x10                ; BIOS interrupt
+    int 0x10 ; call the BIOS interrupt
     
-    popa                    ; Restore registers
-    ret                     ; Return from the function
+    popa ; restore registers
+    ret ; return from function
