@@ -1,51 +1,26 @@
 FRAME_SIZE equ 125 ; 125 sectors (64,000 bytes) per frame
 
-HEADS_PER_CYLINDER equ 0x10 ; 16 heads per cylinder
-SECTORS_PER_TRACK equ 0x3F ; 63 sectors per track
+DISK_ADDRESS_PACKET:
+    db 0x10 ; size of the packet (16 bytes)
+    db 0x00 ; unused byte, always 0
 
-CYLINDER_OFFSET db 0x00 ; cylinder number (low 8 bits)
-HEAD_OFFSET db 0x00 ; head number
-SECTOR_OFFSET db 0x01 ; sector number (6 bits)
+    dw FRAME_SIZE ; number of sectors to read
+    dw 0x0000 ; buffer address
+    dw 0xa000 ; buffer segment
 
-increment_address:
-    add byte [SECTOR_OFFSET], FRAME_SIZE ; increment the offset
-
-    cmp byte [SECTOR_OFFSET], SECTORS_PER_TRACK ; compare the offset to the number of sectors per track
-    jl check_head ; if less, check the head number
-
-    sub byte [SECTOR_OFFSET], SECTORS_PER_TRACK ; subtract the number of sectors per track from the offset
-    inc byte [HEAD_OFFSET] ; increment the head number
-
-check_head:
-    cmp byte [HEAD_OFFSET], HEADS_PER_CYLINDER ; compare the head number to the number of heads per cylinder
-    jl end_incrementation ; if less, we're done
-
-    mov byte [HEAD_OFFSET], 0x00 ; reset the head number
-    inc byte [CYLINDER_OFFSET] ; increment the cylinder number
-
-end_incrementation:
-    ret ; return from function
+    BYTE_OFFSET: dd 0x01 ; byte offset (lower 32-bits)
+    dd 0x00 ; byte offset (upper 32-bits)
 
 read_frame:
     pusha ; save registers
 
-    mov ah, 0x02 ; 'Read Sectors From Drive' function
-    mov al, FRAME_SIZE ; set the number of sectors to read
-
-    mov bx, 0xa000 ; set the video memory address
-    mov es, bx ; copy the address to the extra segment register
-    xor bx, bx ; clear the offset register
-
-    mov ch, byte [CYLINDER_OFFSET] ; load the cylinder number
-    mov dh, byte [HEAD_OFFSET] ; load the head number
-
-    mov cl, byte [SECTOR_OFFSET] ; load the sector number
-    inc cl ; increment the sector number (sectors are 1-indexed)
+    mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
+    mov si, DISK_ADDRESS_PACKET ; load the address of the packet
 
     int 0x13 ; BIOS interrupt
     jc disk_error ; if carry flag is set, an error occurred
 
-    call increment_address ; increment the address
+    add dword [BYTE_OFFSET], FRAME_SIZE ; increment the byte offset
 
     popa ; restore registers
     ret ; return from function
@@ -53,6 +28,9 @@ read_frame:
 disk_error:
     mov si, DISK_ERROR_MESSAGE ; load the address of the error message
     mov cl, ah ; load the error code
+
+    mov ax, 0x02 ; 'Set Video Mode' function with 80x25 text mode
+    int 0x10 ; call the BIOS interrupt
 
     call print ; print the error message
     call print_hex ; print the error code in hex
