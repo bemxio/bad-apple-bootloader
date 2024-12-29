@@ -1,4 +1,4 @@
-FRAME_SIZE equ 4 ; 4 sectors per frame
+FRAME_SIZE equ 125 ; 125 sectors (64,000 bytes) per frame
 
 HEADS_PER_CYLINDER equ 0x10 ; 16 heads per cylinder
 SECTORS_PER_TRACK equ 0x3F ; 63 sectors per track
@@ -30,12 +30,11 @@ read_frame:
     pusha ; save registers
 
     mov ah, 0x02 ; 'Read Sectors From Drive' function
-
-    xor bx, bx ; clear the `bx` register
-    mov es, bx ; set the segment to read to (always 0)
-
     mov al, FRAME_SIZE ; set the number of sectors to read
-    mov bx, FRAME_ADDRESS ; load the address to read to
+
+    mov bx, 0xa000 ; set the video memory address
+    mov es, bx ; copy the address to the extra segment register
+    xor bx, bx ; clear the offset register
 
     mov ch, byte [CYLINDER_OFFSET] ; load the cylinder number
     mov dh, byte [HEAD_OFFSET] ; load the head number
@@ -52,8 +51,8 @@ read_frame:
     ret ; return from function
 
 disk_error:
-    mov bp, DISK_ERROR_MESSAGE ; load the address of the error message
-    mov cl, ah ; load the error cod
+    mov si, DISK_ERROR_MESSAGE ; load the address of the error message
+    mov cl, ah ; load the error code
 
     call print ; print the error message
     call print_hex ; print the error code in hex
