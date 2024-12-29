@@ -5,10 +5,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <cstdint>
-#include <cstddef>
-#include <cmath>
-
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 200
 
@@ -41,10 +37,7 @@ int main(int argc, char** argv) {
     //std::cout << "Screen size: " << SCREEN_WIDTH << "x" << SCREEN_HEIGHT << " (width x height)" << std::endl;
     //std::cout << "Total frames: " << length << std::endl;
 
-    uint8_t data[size];
-    uint8_t pixel;
-
-    //capture.set(cv::CAP_PROP_POS_FRAMES, 1000);
+    char data[size];
 
     for (int index = 1; index <= length; index++) {
         capture >> frame;
@@ -53,20 +46,20 @@ int main(int argc, char** argv) {
             break;
         }
 
-        cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
         cv::resize(frame, frame, cv::Size(SCREEN_WIDTH, SCREEN_HEIGHT));
+        //cv::applyColorMap(frame, frame, palette);
 
         for (int row = 0; row < SCREEN_HEIGHT; row++) {
             for (int column = 0; column < SCREEN_WIDTH; column++) {
-                pixel = frame.at<uchar>(row, column);
-                pixel = round(pixel / 85.0) * 85;
-
-                data[(row * SCREEN_WIDTH) + column] = pixel;
+                data[(row * SCREEN_WIDTH) + column] = frame.at<cv::Vec3b>(row, column)[0] >= 128 ? 0x0f : 0x00;
             }
         }
 
-        file.write(reinterpret_cast<char*>(data), size);
+        file.write(data, size);
     }
+
+    file.close();
+    capture.release();
 
     return 0;
 }
