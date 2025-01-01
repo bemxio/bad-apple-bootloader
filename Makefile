@@ -21,8 +21,6 @@ FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_COUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
-ASCII_GRADIENT = oxxo
-
 # phony
 .PHONY: all run clean
 
