@@ -7,29 +7,60 @@
 
 #include "palette.hpp"
 
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 200
+const unsigned short SCREEN_WIDTH = 320;
+const unsigned short SCREEN_HEIGHT = 200;
 
-unsigned char getClosestColor(cv::Vec3b pixel) {
-    unsigned char result = 0;
+char getColorIndex(const cv::Vec3b& color) {
+    return std::find(PALETTE.begin(), PALETTE.end(), color) - PALETTE.begin();
+}
+
+cv::Vec3b findNearestColor(const cv::Vec3b& color) {
+    cv::Vec3b nearestColor;
     int distance = 255 * 255 * 3;
 
-    for (size_t index = 0; index < 256; index++) {
-        unsigned char* color = PALETTE[index];
+    for (const cv::Vec3b& paletteColor : PALETTE) {
+        char r = color[0] - paletteColor[0];
+        char g = color[1] - paletteColor[1];
+        char b = color[2] - paletteColor[2];
 
-        char r = pixel[0] - color[0];
-        char g = pixel[1] - color[1];
-        char b = pixel[2] - color[2];
+        int currentDistance = (r * r) + (g * g) + (b * b);
 
-        int current = (r * r) + (g * g) + (b * b);
-
-        if (current < distance) {
-            result = index;
-            distance = current;
+        if (currentDistance < distance) {
+            nearestColor = paletteColor;
+            distance = currentDistance;
         }
     }
 
-    return result;
+    return nearestColor;
+}
+
+void applyDithering(cv::Mat& image) {
+    for (size_t y = 0; y < SCREEN_HEIGHT; y++) {
+        for (size_t x = 0; x < SCREEN_WIDTH; x++) {
+            cv::Vec3b oldPixel = image.at<cv::Vec3b>(y, x);
+            cv::Vec3b newPixel = findNearestColor(oldPixel);
+
+            cv::Vec3b quantError = oldPixel - newPixel;
+
+            if (x + 1 < SCREEN_WIDTH) {
+                image.at<cv::Vec3b>(y, x + 1) += quantError * 7 / 16;
+            }
+
+            if (y + 1 < SCREEN_HEIGHT) {
+                if (x > 0) {
+                    image.at<cv::Vec3b>(y + 1, x - 1) += quantError * 3 / 16;
+                }
+
+                image.at<cv::Vec3b>(y + 1, x) += quantError * 5 / 16;
+
+                if (x + 1 < SCREEN_WIDTH) {
+                    image.at<cv::Vec3b>(y + 1, x + 1) += quantError * 1 / 16;
+                }
+            }
+
+            image.at<cv::Vec3b>(y, x) = newPixel;
+        }
+    }
 }
 
 int main(int argc, char** argv) {
@@ -61,9 +92,9 @@ int main(int argc, char** argv) {
     //std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
     //std::cout << "Total frames: " << length << std::endl;
 
-    unsigned char data[size];
+    char data[size];
 
-    for (size_t index = 1; index <= length; index++) {
+    for (size_t index = 0; index < length; index++) {
         capture >> frame;
 
         if (frame.empty()) {
@@ -71,14 +102,15 @@ int main(int argc, char** argv) {
         }
 
         cv::resize(frame, frame, cv::Size(SCREEN_WIDTH, SCREEN_HEIGHT));
+        applyDithering(frame);
 
-        for (size_t row = 0; row < SCREEN_HEIGHT; row++) {
-            for (size_t column = 0; column < SCREEN_WIDTH; column++) {
-                data[(row * SCREEN_WIDTH) + column] = getClosestColor(frame.at<cv::Vec3b>(row, column));
+        for (size_t y = 0; y < SCREEN_HEIGHT; y++) {
+            for (size_t x = 0; x < SCREEN_WIDTH; x++) {
+                data[y * SCREEN_WIDTH + x] = getColorIndex(frame.at<cv::Vec3b>(y, x));
             }
         }
 
-        file.write(reinterpret_cast<char*>(data), size);
+        file.write(data, size);
     }
 
     file.close();
