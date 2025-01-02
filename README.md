@@ -53,6 +53,9 @@ Actually, I was wrong. [@redstone_flash5774](https://www.youtube.com/channel/UCx
 The `image.img` file is split into two parts - the first one is the bootsector code itself, and the second one is the video data.
 The code reads each frame from the video data and displays it on the screen, by iterating over each frame, reading it from the disk to the video memory.
 
+### What's up with the file size?
+As of right now, the frames are stored in a raw uncompressed format. Each frame takes up 64000 bytes, and with Bad Apple having around 6500 frames, the total is around 400 megabytes. In the future, I'm planning to implement a better way to store the frames with compression.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
