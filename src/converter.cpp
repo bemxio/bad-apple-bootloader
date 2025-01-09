@@ -10,20 +10,20 @@
 const unsigned short SCREEN_WIDTH = 320;
 const unsigned short SCREEN_HEIGHT = 200;
 
-char getColorIndex(const cv::Vec3b& color) {
+uint8_t getColorIndex(const cv::Vec3b& color) {
     return std::find(PALETTE.begin(), PALETTE.end(), color) - PALETTE.begin();
 }
 
 cv::Vec3b findNearestColor(const cv::Vec3b& color) {
     cv::Vec3b nearestColor;
-    int distance = 255 * 255 * 3;
+    uint32_t distance = 255 * 255 * 3;
 
     for (const cv::Vec3b& paletteColor : PALETTE) {
-        char r = color[0] - paletteColor[0];
-        char g = color[1] - paletteColor[1];
-        char b = color[2] - paletteColor[2];
+        uint8_t r = color[0] - paletteColor[0];
+        uint8_t g = color[1] - paletteColor[1];
+        uint8_t b = color[2] - paletteColor[2];
 
-        int currentDistance = (r * r) + (g * g) + (b * b);
+        uint32_t currentDistance = (r * r) + (g * g) + (b * b);
 
         if (currentDistance < distance) {
             nearestColor = paletteColor;
@@ -86,13 +86,13 @@ int main(int argc, char** argv) {
 
     size_t size = SCREEN_WIDTH * SCREEN_HEIGHT;
     size_t sectors = round(size / 512.0);
-    size_t length = (size_t)capture.get(cv::CAP_PROP_FRAME_COUNT);
+    size_t length = capture.get(cv::CAP_PROP_FRAME_COUNT);
+
+    //capture.set(cv::CAP_PROP_POS_FRAMES, 1000);
 
     //std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
     //std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
     //std::cout << "Total frames: " << length << std::endl;
-
-    char data[size];
 
     for (size_t index = 0; index < length; index++) {
         capture >> frame;
@@ -103,18 +103,29 @@ int main(int argc, char** argv) {
 
         cv::resize(frame, frame, cv::Size(SCREEN_WIDTH, SCREEN_HEIGHT));
         applyDithering(frame);
+        
+        uint8_t runLength = 1;
+        uint8_t runByte;
 
         for (size_t y = 0; y < SCREEN_HEIGHT; y++) {
             for (size_t x = 0; x < SCREEN_WIDTH; x++) {
-                data[y * SCREEN_WIDTH + x] = getColorIndex(frame.at<cv::Vec3b>(y, x));
+                uint8_t currentByte = getColorIndex(frame.at<cv::Vec3b>(y, x));
+
+                if (runByte == currentByte && runLength < 255) {
+                    runLength++; continue;
+                }
+
+                file.write(reinterpret_cast<char*>(&runLength), 1);
+                file.write(reinterpret_cast<char*>(&runByte), 1);
+
+                runLength = 1;
+                runByte = currentByte;
             }
         }
-
-        file.write(data, size);
     }
 
-    file.close();
     capture.release();
+    file.close();
 
     return 0;
 }
