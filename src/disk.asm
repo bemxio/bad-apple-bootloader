@@ -1,34 +1,46 @@
 DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00
 
 DRIVE_NUMBER: db 0x80 ; main hard drive
-FRAME_SIZE equ 125 ; 125 sectors (64,000 bytes) per frame
+CHUNK_SIZE equ 120 ; 120 sectors (61,440 bytes) per 1/8 of a chunk
 ;FRAME_AMOUNT equ 6569 ; 6569 frames (03:38 with 30 FPS)
 
 DISK_ADDRESS_PACKET:
     db 0x10 ; size of the packet (16 bytes)
     db 0x00 ; unused byte, always 0
 
-    dw FRAME_SIZE ; number of sectors to read
-    dw 0x00 ; buffer address
-    dw 0xa000 ; buffer segment
+    dw CHUNK_SIZE ; number of sectors to read
+    dw 0x00 ; buffer offset
+    BUFFER_SEGMENT: dw 0x7e0 ; buffer segment
 
-    BYTE_OFFSET: dd 0x01 ; byte offset (lower 32-bits)
-    dd 0x00 ; byte offset (upper 32-bits)
+    SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
+    dd 0x00 ; sector offset (upper 32-bits)
 
-read_frame:
+read_chunk:
     pusha ; save registers
 
-    mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
-    mov si, DISK_ADDRESS_PACKET ; load the address of the packet
-    mov dl, byte [DRIVE_NUMBER] ; load the drive number
+    xor bh, bh ; clear the 1/8 chunk counter
 
-    int 0x13 ; BIOS interrupt
-    jc disk_error ; if carry flag is set, an error occurred
+    read_chunk_loop:
+        mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
+        mov dl, byte [DRIVE_NUMBER] ; load the drive number
+        mov si, DISK_ADDRESS_PACKET ; load the address of the packet
 
-    add dword [BYTE_OFFSET], FRAME_SIZE ; increment the byte offset
+        int 0x13 ; BIOS interrupt
+        jc disk_error ; if carry flag is set, an error occurred
 
-    popa ; restore registers
-    ret ; return from function
+        add dword [SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
+        add word [BUFFER_SEGMENT], 0x20 * CHUNK_SIZE ; increment the buffer segment
+
+        inc bh ; increment the 1/8 chunk counter
+
+        cmp bh, 0x08 ; compare the 1/8 chunk counter to 8
+        jl read_chunk_loop ; if less, repeat the loop
+
+    read_chunk_end:
+        mov word [BUFFER_SEGMENT], 0x7e0 ; reset the buffer segment
+
+        popa ; restore registers
+        ret ; return from function
 
 disk_error:
     mov si, DISK_ERROR_MESSAGE ; load the address of the error message
