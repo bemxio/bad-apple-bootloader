@@ -92,8 +92,6 @@ int main(int argc, char** argv) {
     //std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
     //std::cout << "Total frames: " << length << std::endl;
 
-    char data[size];
-
     for (size_t index = 0; index < length; index++) {
         capture >> frame;
 
@@ -104,13 +102,24 @@ int main(int argc, char** argv) {
         cv::resize(frame, frame, cv::Size(SCREEN_WIDTH, SCREEN_HEIGHT));
         applyDithering(frame);
 
+        uint8_t runLength = 1;
+        uint8_t runByte;
+
         for (size_t y = 0; y < SCREEN_HEIGHT; y++) {
             for (size_t x = 0; x < SCREEN_WIDTH; x++) {
-                data[y * SCREEN_WIDTH + x] = getColorIndex(frame.at<cv::Vec3b>(y, x));
+                uint8_t currentByte = getColorIndex(frame.at<cv::Vec3b>(y, x));
+
+                if (runByte == currentByte && runLength < 255) {
+                    runLength++; continue;
+                }
+
+                file.write(reinterpret_cast<char*>(&runLength), 1);
+                file.write(reinterpret_cast<char*>(&runByte), 1);
+
+                runLength = 1;
+                runByte = currentByte;
             }
         }
-
-        file.write(data, size);
     }
 
     file.close();
