@@ -36,8 +36,8 @@ pit_handler:
 
 ; includes
 %include "src/disk.asm"
-%include "src/pit.asm"
 %include "src/rle.asm"
+%include "src/pit.asm"
 %include "src/serial.asm"
 
 ; debug messages
