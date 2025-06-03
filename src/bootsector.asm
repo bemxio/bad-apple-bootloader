@@ -11,10 +11,13 @@ mov dx, COM1_SERIAL_PORT ; set the serial port address
 cli ; disable interrupts
 
 call setup_serial ; set up the serial port
-call setup_pit ; set up the Programmable Interval Timer
-call setup_ivt ; set up the Interrupt Vector Table
+;call setup_pit ; set up the Programmable Interval Timer
+;call setup_ivt ; set up the Interrupt Vector Table
 
 sti ; re-enable interrupts
+
+call read_chunk ; read the first chunk of data from the disk
+call decode_frame ; read the first frame into the video memory
 
 loop_forever:
     jmp $ ; loop forever
@@ -23,7 +26,7 @@ pit_handler:
     cmp cx, FRAME_AMOUNT ; compare frame counter to frame amount
     je loop_forever ; if equal, loop forever
 
-    call read_frame ; read the frame into the video memory
+    call decode_frame ; read the frame into the video memory
     inc cx ; increment the frame counter
 
     mov al, 0x20 ; EOI signal
@@ -34,6 +37,7 @@ pit_handler:
 ; includes
 %include "src/disk.asm"
 %include "src/pit.asm"
+%include "src/rle.asm"
 %include "src/serial.asm"
 
 ; debug messages
