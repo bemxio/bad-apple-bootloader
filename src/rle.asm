@@ -9,6 +9,16 @@ decode_frame:
     mov es, di ; move the value to the extra segment register
     xor di, di ; clear the destination index
 
+    %ifdef VERBOSE_OUTPUT
+        mov cl, byte [RLE_BUFFER_OFFSET + 1]
+        call print_hex
+
+        mov cl, byte [RLE_BUFFER_OFFSET]
+        call print_hex
+
+        call line_break
+    %endif
+
     decode_frame_loop:
         lodsb ; load the run length from the buffer
 
@@ -18,18 +28,16 @@ decode_frame:
         test cl, cl ; check if the run length is zero
         jnz decode_frame_write ; if not, repeat the loop
 
-        ;jmp decode_frame_end
-
         mov si, 0x7e00 ; reset the source index
         call read_chunk ; read a chunk of data from the disk
 
         jmp decode_frame_loop ; jump back to the main loop
 
         decode_frame_write:
-            stosb ; store the run byte in the video memory
-
             cmp di, 0xfa00 ; compare the destination index to the end of the video memory
             je decode_frame_end ; if equal, end the function
+
+            stosb ; store the run byte in the video memory
 
             dec cl ; decrement the run length
             jnz decode_frame_write ; if not zero, repeat the write loop
