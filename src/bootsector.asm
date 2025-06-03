@@ -36,6 +36,14 @@ pit_handler:
 %include "src/pit.asm"
 %include "src/serial.asm"
 
+; debug messages
+%ifdef VERBOSE_OUTPUT
+    DEBUG_TYPE_SERIAL: db "Serial port", 0x00
+    DEBUG_TYPE_PIT: db "PIT", 0x00
+    DEBUG_TYPE_IVT: db "IVT", 0x00
+    DEBUG_SUCCESSFUL_INIT: db " successfully initialized", 0x00
+%endif
+
 ; pad the rest of the sector with zeros
 times 510 - ($ - $$) db 0x00
 

@@ -13,6 +13,16 @@ setup_pit:
     mov al, ah ; move the high byte to the low byte
     out 0x40, al ; send the reload value high byte to the PIT
 
+    %ifdef VERBOSE_OUTPUT
+        mov si, DEBUG_TYPE_PIT ; load the address of the message type
+        call print ; print it
+
+        mov si, DEBUG_SUCCESSFUL_INIT ; load the address of the success message
+        call print ; print it
+
+        call line_break ; add a line break
+    %endif
+
     popa ; restore registers
     ret ; return from function
 
@@ -21,6 +31,16 @@ setup_ivt:
 
     mov word [IVT_IRQ0_OFFSET], pit_handler ; set the PIT handler offset in the IVT
     mov word [IVT_IRQ0_OFFSET + 2], cs ; set the PIT handler segment in the IVT
+
+    %ifdef VERBOSE_OUTPUT
+        mov si, DEBUG_TYPE_IVT ; load the address of the message type
+        call print ; print it
+
+        mov si, DEBUG_SUCCESSFUL_INIT ; load the address of the success message
+        call print ; print it
+
+        call line_break ; add a line break
+    %endif
 
     popa ; restore registers
     ret ; return from function

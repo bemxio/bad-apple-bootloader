@@ -33,6 +33,18 @@ setup_serial:
     add dx, 0x02 ; set the MCR address
     out dx, al ; send the command to the MCR
 
+    %ifdef VERBOSE_OUTPUT
+        sub dx, 0x04 ; reset the serial port address
+
+        mov si, DEBUG_TYPE_SERIAL ; load the address of the message type
+        call print ; print it
+
+        mov si, DEBUG_SUCCESSFUL_INIT ; load the address of the success message
+        call print ; print it
+
+        call line_break ; add a line break
+    %endif
+
     popa ; restore registers
     ret ; return from function
 

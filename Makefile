@@ -9,6 +9,8 @@ ASFLAGS = -f bin
 QEMU = qemu-system-i386
 QEMUFLAGS = -accel kvm
 
+DEBUG = 1
+
 SRC_DIR = src
 BUILD_DIR = build
 
@@ -20,6 +22,11 @@ VIDEO_PATH = video.flv
 FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_AMOUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
+
+# debug flags
+ifeq ($(DEBUG), 1)
+	ASFLAGS += -DVERBOSE_OUTPUT
+endif
 
 # phony
 .PHONY: all run clean
