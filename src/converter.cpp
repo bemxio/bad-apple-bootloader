@@ -88,8 +88,8 @@ int main(int argc, char** argv) {
     size_t sectors = round(size / 512.0);
     size_t length = (size_t)capture.get(cv::CAP_PROP_FRAME_COUNT);
 
-    capture.set(cv::CAP_PROP_POS_FRAMES, 150);
-    length = 300;
+    //capture.set(cv::CAP_PROP_POS_FRAMES, 150);
+    //length = 300;
 
     std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
     std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
@@ -112,6 +112,10 @@ int main(int argc, char** argv) {
             for (size_t x = 0; x < SCREEN_WIDTH; x++) {
                 uint8_t currentByte = getColorIndex(frame.at<cv::Vec3b>(y, x));
 
+                if (x == 0 && y == 0) {
+                    runByte = currentByte; continue;
+                }
+
                 if (runByte == currentByte && runLength < 255) {
                     runLength++; continue;
                 }
@@ -123,6 +127,9 @@ int main(int argc, char** argv) {
                 runByte = currentByte;
             }
         }
+
+        file.write(reinterpret_cast<char*>(&runLength), 1);
+        file.write(reinterpret_cast<char*>(&runByte), 1);
     }
 
     file.close();
