@@ -7,7 +7,7 @@ AS = nasm
 ASFLAGS = -f bin
 
 QEMU = qemu-system-i386
-QEMUFLAGS = -accel kvm
+QEMUFLAGS = -accel kvm -serial stdio
 
 DEBUG = 1
 
