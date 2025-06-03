@@ -7,23 +7,23 @@
 
 #include "palette.hpp"
 
-const unsigned short SCREEN_WIDTH = 320;
-const unsigned short SCREEN_HEIGHT = 200;
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 200
 
-char getColorIndex(const cv::Vec3b& color) {
+uint8_t getColorIndex(const cv::Vec3b& color) {
     return std::find(PALETTE.begin(), PALETTE.end(), color) - PALETTE.begin();
 }
 
 cv::Vec3b findNearestColor(const cv::Vec3b& color) {
     cv::Vec3b nearestColor;
-    int distance = 255 * 255 * 3;
+    uint32_t distance = 255 * 255 * 3;
 
     for (const cv::Vec3b& paletteColor : PALETTE) {
-        char r = color[0] - paletteColor[0];
-        char g = color[1] - paletteColor[1];
-        char b = color[2] - paletteColor[2];
+        int8_t r = color[0] - paletteColor[0];
+        int8_t g = color[1] - paletteColor[1];
+        int8_t b = color[2] - paletteColor[2];
 
-        int currentDistance = (r * r) + (g * g) + (b * b);
+        uint32_t currentDistance = (r * r) + (g * g) + (b * b);
 
         if (currentDistance < distance) {
             nearestColor = paletteColor;
