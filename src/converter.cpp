@@ -88,6 +88,9 @@ int main(int argc, char** argv) {
     size_t sectors = round(size / 512.0);
     size_t length = (size_t)capture.get(cv::CAP_PROP_FRAME_COUNT);
 
+    capture.set(cv::CAP_PROP_POS_FRAMES, 150);
+    length = 300;
+
     //std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
     //std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
     //std::cout << "Total frames: " << length << std::endl;
