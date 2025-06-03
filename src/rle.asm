@@ -34,10 +34,10 @@ decode_frame:
         jmp decode_frame_loop ; jump back to the main loop
 
         decode_frame_write:
+            stosb ; store the run byte in the video memory
+
             cmp di, 0xfa00 ; compare the destination index to the end of the video memory
             je decode_frame_end ; if equal, end the function
-
-            stosb ; store the run byte in the video memory
 
             dec cl ; decrement the run length
             jnz decode_frame_write ; if not zero, repeat the write loop
