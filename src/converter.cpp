@@ -91,9 +91,9 @@ int main(int argc, char** argv) {
     capture.set(cv::CAP_PROP_POS_FRAMES, 150);
     length = 300;
 
-    //std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
-    //std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
-    //std::cout << "Total frames: " << length << std::endl;
+    std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
+    std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
+    std::cout << "Total frames: " << length << std::endl;
 
     for (size_t index = 0; index < length; index++) {
         capture >> frame;

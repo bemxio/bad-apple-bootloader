@@ -16,7 +16,6 @@ call setup_serial ; set up the serial port
 
 sti ; re-enable interrupts
 
-call read_chunk ; read the first chunk of data from the disk
 %rep 1
     call decode_frame ; read the frame into the video memory
 %endrep
