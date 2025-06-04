@@ -25,6 +25,7 @@ RELOAD_VALUE = $$((1193182 / $(FPS)))
 VERBOSE = 1
 
 ifeq ($(VERBOSE), 1)
+	CXXFLAGS += -DVERBOSE_OUTPUT
 	ASFLAGS += -DVERBOSE_OUTPUT
 endif
 
@@ -35,7 +36,7 @@ endif
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
 run: $(BUILD_DIR)/$(EXECUTABLE)
-	$(QEMU) $(QEMUFLAGS) -drive format=raw,file=$^ 
+	$(QEMU) $(QEMUFLAGS) -drive format=raw,file=$^
 
 clean:
 	$(RM) -r build
