@@ -9,8 +9,6 @@ ASFLAGS = -f bin
 QEMU = qemu-system-i386
 QEMUFLAGS = -accel kvm -serial stdio
 
-DEBUG = 1
-
 SRC_DIR = src
 BUILD_DIR = build
 
@@ -23,8 +21,10 @@ FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_AMOUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
-# debug flags
-ifeq ($(DEBUG), 1)
+# flag for verbose output
+VERBOSE = 1
+
+ifeq ($(VERBOSE), 1)
 	ASFLAGS += -DVERBOSE_OUTPUT
 endif
 
