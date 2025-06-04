@@ -30,6 +30,21 @@ pit_handler:
     call decode_frame ; read the frame into the video memory
     inc cx ; increment the frame counter
 
+    %ifdef VERBOSE_OUTPUT
+        mov bx, cx ; save the frame counter
+
+        mov cl, bh ; set the high byte of the frame counter
+        call print_hex ; print the high byte of the frame counter
+
+        mov cl, bl ; set the low byte of the frame counter
+        call print_hex ; print the low byte of the frame counter
+
+        mov al, 0x0d ; carriage return
+        out dx, al ; send the character to the serial port
+
+        mov cx, bx ; restore the frame counter
+    %endif
+
     mov al, 0x20 ; EOI signal
     out 0x20, al ; send it to the PIT
 
