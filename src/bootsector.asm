@@ -16,7 +16,7 @@ call setup_serial ; set up the serial port
 
 sti ; re-enable interrupts
 
-%rep 1
+%rep 10
     call decode_frame ; read the frame into the video memory
 %endrep
 
