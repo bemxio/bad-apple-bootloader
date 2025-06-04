@@ -1,23 +1,13 @@
-RLE_BUFFER_OFFSET: dw 0x7e00 ; offset of the buffer
+BUFFER_OFFSET: dw 0x7e00 ; offset of the buffer
 
 decode_frame:
     pusha ; save registers
 
-    mov si, word [RLE_BUFFER_OFFSET] ; load the offset of the buffer
+    mov si, word [BUFFER_OFFSET] ; load the offset of the buffer
 
     mov di, 0xa000 ; set the video memory segment
     mov es, di ; move the value to the extra segment register
     xor di, di ; clear the destination index
-
-    %ifdef VERBOSE_OUTPUT
-        mov cl, byte [RLE_BUFFER_OFFSET + 1]
-        call print_hex
-
-        mov cl, byte [RLE_BUFFER_OFFSET]
-        call print_hex
-
-        call line_break
-    %endif
 
     decode_frame_loop:
         lodsb ; load the run length from the buffer
@@ -45,7 +35,7 @@ decode_frame:
             jmp decode_frame_loop ; jump back to the main loop
 
     decode_frame_end:
-        mov word [RLE_BUFFER_OFFSET], si ; save the source index
+        mov word [BUFFER_OFFSET], si ; save the source index
 
         popa ; restore registers
         ret ; return from function
