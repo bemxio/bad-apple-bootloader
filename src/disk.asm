@@ -1,7 +1,7 @@
 DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00
 
 DRIVE_NUMBER: db 0x80 ; main hard drive
-CHUNK_SIZE equ 120 ; 120 sectors (61,440 bytes) per 1/8 of a chunk
+CHUNK_SIZE equ 64 ; 64 sectors (32,768 bytes) per chunk
 ;FRAME_AMOUNT equ 6569 ; 6569 frames (03:38 with 30 FPS)
 
 DISK_ADDRESS_PACKET:
@@ -9,8 +9,8 @@ DISK_ADDRESS_PACKET:
     db 0x00 ; unused byte, always 0
 
     dw CHUNK_SIZE ; number of sectors to read
-    dw 0x00 ; buffer offset
-    BUFFER_SEGMENT: dw 0x7e0 ; buffer segment
+    dw 0x7e00 ; buffer offset
+    dw 0x00 ; buffer segment
 
     SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
     dd 0x00 ; sector offset (upper 32-bits)
@@ -18,29 +18,17 @@ DISK_ADDRESS_PACKET:
 read_chunk:
     pusha ; save registers
 
-    xor bh, bh ; clear the 1/8 chunk counter
+    mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
+    mov dl, byte [DRIVE_NUMBER] ; load the drive number
+    mov si, DISK_ADDRESS_PACKET ; load the address of the packet
 
-    read_chunk_loop:
-        mov ah, 0x42 ; 'Extended Read Sectors From Drive' function
-        mov dl, byte [DRIVE_NUMBER] ; load the drive number
-        mov si, DISK_ADDRESS_PACKET ; load the address of the packet
+    int 0x13 ; BIOS interrupt
+    jc disk_error ; if carry flag is set, an error occurred
 
-        int 0x13 ; BIOS interrupt
-        jc disk_error ; if carry flag is set, an error occurred
+    add dword [SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset by the chunk size
 
-        add dword [SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
-        add word [BUFFER_SEGMENT], 0x20 * CHUNK_SIZE ; increment the buffer segment
-
-        inc bh ; increment the 1/8 chunk counter
-
-        cmp bh, 0x08 ; compare the 1/8 chunk counter to 8
-        jl read_chunk_loop ; if less, repeat the loop
-
-    read_chunk_end:
-        mov word [BUFFER_SEGMENT], 0x7e0 ; reset the buffer segment
-
-        popa ; restore registers
-        ret ; return from function
+    popa ; restore registers
+    ret ; return from function
 
 disk_error:
     mov si, DISK_ERROR_MESSAGE ; load the address of the error message

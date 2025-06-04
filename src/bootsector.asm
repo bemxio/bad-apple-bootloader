@@ -11,14 +11,14 @@ mov dx, COM1_SERIAL_PORT ; set the serial port address
 cli ; disable interrupts
 
 call setup_serial ; set up the serial port
-;call setup_pit ; set up the Programmable Interval Timer
-;call setup_ivt ; set up the Interrupt Vector Table
+call setup_pit ; set up the Programmable Interval Timer
+call setup_ivt ; set up the Interrupt Vector Table
 
 sti ; re-enable interrupts
 
-%rep 10
-    call decode_frame ; read the frame into the video memory
-%endrep
+;%rep 2
+;    call decode_frame ; read the frame into the video memory
+;%endrep
 
 loop_forever:
     jmp $ ; loop forever
