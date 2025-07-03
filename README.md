@@ -2,7 +2,7 @@
 A program running inside the boot sector, specifically made for playing [Bad Apple](https://www.youtube.com/watch?v=UkgK8eUdpAo).
 Inspired by the [GRUB](https://github.com/noeamiot/Bad-Apple-on-GRUB) version, and my urge for low-level programming.
 
-Check out the video showcasing it [here](https://www.youtube.com/watch?v=eKCEhFYnbD8)!
+Check out the video showcasing it [here](https://youtu.be/27b-6o6CdvA)!
 
 ## Usage
 To build the bootloader in the easiest way, just follow the instructions below.
