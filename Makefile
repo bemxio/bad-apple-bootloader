@@ -1,8 +1,4 @@
 # constants
-CXX = g++
-CXXFLAGS = -O2
-CXXLIBS = -I/usr/include/opencv4 -lopencv_videoio -lopencv_imgproc -lopencv_core
-
 AS = nasm
 ASFLAGS = -f bin
 
@@ -15,17 +11,13 @@ BUILD_DIR = build
 SOURCES = $(sort $(wildcard $(SRC_DIR)/*.asm))
 EXECUTABLE = image.img
 
-VIDEO_PATH = video.flv
+VIDEO_PATH = video.mp4
 
 FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_AMOUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
-# flag for verbose output
-VERBOSE = 1
-
-ifeq ($(VERBOSE), 1)
-	CXXFLAGS += -DVERBOSE_OUTPUT
+ifdef VERBOSE
 	ASFLAGS += -DVERBOSE_OUTPUT
 endif
 
@@ -51,8 +43,8 @@ $(BUILD_DIR)/bootsector.bin: $(SOURCES) | $(BUILD_DIR)
 $(BUILD_DIR)/frames.bin: $(VIDEO_PATH) $(BUILD_DIR)/converter | $(BUILD_DIR)
 	$(BUILD_DIR)/converter $< $@
 
-$(BUILD_DIR)/converter: $(SRC_DIR)/converter.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXLIBS) $(CXXFLAGS) $< -o $@
+$(BUILD_DIR)/converter: | $(BUILD_DIR)
+	$(MAKE) -C $(SRC_DIR)/converter
 
 $(BUILD_DIR):
 	mkdir -p $@

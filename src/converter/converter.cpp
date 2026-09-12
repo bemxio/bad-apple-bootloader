@@ -63,6 +63,16 @@ void applyDithering(cv::Mat& image) {
     }
 }
 
+std::string generateProgressBar(size_t current, size_t total) {
+    std::string progressBar = "[";
+
+    progressBar += std::string(current * 32 / total, '#');
+    progressBar += std::string(32 - (current * 32 / total), '.');
+    progressBar += "]";
+
+    return progressBar;
+}
+
 int main(int argc, char** argv) {
     if (argc != 3) {
         std::cout << "Usage: " << argv[0] << " <input> <output>" << std::endl; return 1;
@@ -91,11 +101,8 @@ int main(int argc, char** argv) {
     //capture.set(cv::CAP_PROP_POS_FRAMES, 150);
     //length = 300;
 
-    #ifdef VERBOSE_OUTPUT
-        std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
-        std::cout << "Screen size: " << SCREEN_WIDTH << " x " << SCREEN_HEIGHT << std::endl;
-        std::cout << "Total frames: " << length << std::endl;
-    #endif
+    std::cout << "Frame size: " << size << " bytes (" << sectors << " sectors)" << std::endl;
+    std::cout << "Resolution: " << SCREEN_WIDTH << 'x' << SCREEN_HEIGHT << std::endl;
 
     for (size_t index = 0; index < length; index++) {
         capture >> frame;
@@ -132,7 +139,15 @@ int main(int argc, char** argv) {
 
         file.write(reinterpret_cast<char*>(&runLength), 1);
         file.write(reinterpret_cast<char*>(&runByte), 1);
+
+        std::cout << generateProgressBar(index + 1, length) << ' ';
+        std::cout << index + 1 << '/' << length;
+        std::cout << " (" << (index + 1) * 100 / length << "%)";
+
+        std::cout << '\r' << std::flush;
     }
+
+    std::cout << std::endl;
 
     file.close();
     capture.release();
