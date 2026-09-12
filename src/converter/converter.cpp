@@ -1,9 +1,10 @@
-#include <opencv2/videoio.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 #include "palette.hpp"
 
