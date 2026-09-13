@@ -36,10 +36,7 @@ setup_serial:
     %ifndef SIZE_OPTIMIZED
         sub dx, 0x04 ; reset the serial port address
 
-        mov si, DEBUG_TYPE_SERIAL ; load the address of the message type
-        call print ; print it
-
-        mov si, DEBUG_SUCCESSFUL_INIT ; load the address of the success message
+        mov si, SERIAL_TEST_MESSAGE ; load the address of the test message
         call print ; print it
 
         call line_break ; add a line break
