@@ -7,16 +7,13 @@ int 0x10 ; call the BIOS interrupt
 xor cx, cx ; clear frame counter
 mov byte [DRIVE_NUMBER], dl ; set the drive number
 
-cli ; disable interrupts
-
 call setup_pit ; set up the programmable interval timer
+call setup_sb16 ; set up the sound card
 
 %ifndef SIZE_OPTIMIZED
     mov dx, COM1_SERIAL_PORT ; set the serial port address
     call setup_serial ; set up the serial port
 %endif
-
-sti ; re-enable interrupts
 
 loop_forever:
     jmp $ ; loop forever
@@ -44,19 +41,21 @@ pit_handler:
     %endif
 
     mov al, 0x20 ; EOI signal
-    out 0x20, al ; send it to the PIT
+    out 0x20, al ; send the signal to the PIC
 
     iret ; return from interrupt
 
 ; includes
 %include "src/pit.asm"
 %include "src/video.asm"
+%include "src/audio.asm"
 
 ; debug messages
 %ifndef SIZE_OPTIMIZED
     %include "src/serial.asm"
 
     DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00
+    SB16_ERROR_MESSAGE: db "Error: Sound card initialization failed; expected 0xAA, got 0x", 0x00
     SERIAL_TEST_MESSAGE: db "Hello, world!", 0x00
 %endif
 

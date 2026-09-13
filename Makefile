@@ -6,7 +6,7 @@ CC = gcc
 CFLAGS = -Wall -O2
 
 QEMU = qemu-system-i386
-QEMUFLAGS = -accel kvm -serial stdio
+QEMUFLAGS = -accel kvm -audiodev alsa,id=snd0 -device sb16,audiodev=snd0 -serial stdio
 
 SRC_DIR = src
 BUILD_DIR = build
@@ -45,8 +45,9 @@ clean:
 	$(RM) -r build
 
 # rules
-$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/frames.bin
+$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/frames.bin $(BUILD_DIR)/sound.bin
 	cat $^ > $@
+	truncate -s %512 $@
 
 $(BUILD_DIR)/bootsector.bin: $(SRC_DIR)/bootsector.asm $(SOURCES) | $(BUILD_DIR)
 	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_AMOUNT) $< -o $@
@@ -55,6 +56,9 @@ $(BUILD_DIR)/frames.bin: $(BUILD_DIR)/compressor $(VIDEO_PATH) $(PALETTE_PATH) |
 	ffmpeg -i $(VIDEO_PATH) -f rawvideo -pix_fmt rgb24 -s 16x16 -i $(PALETTE_PATH) \
 		-filter_complex '[0:v]scale=320:200[scaled];[scaled][1:v]paletteuse=dither=sierra2' \
 		-f rawvideo -pix_fmt rgb24 - | $(BUILD_DIR)/compressor > $@
+
+$(BUILD_DIR)/sound.bin: $(VIDEO_PATH) | $(BUILD_DIR)
+	ffmpeg -i $(VIDEO_PATH) -f s16le -ac 2 -ar 44100 -acodec pcm_s16le -vn $@
 
 $(BUILD_DIR)/compressor: $(SRC_DIR)/compressor.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $^ -o $@ 
