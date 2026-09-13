@@ -52,11 +52,7 @@ int main(int argc, char** argv) {
     fclose(file);
 
     // compression loop
-    while (1) {
-        if (fread(buffer, sizeof(uint8_t), FRAME_SIZE, stdin) != FRAME_SIZE) {
-            break;
-        }
-
+    while (fread(buffer, sizeof(uint8_t), FRAME_SIZE, stdin) == FRAME_SIZE) {
         uint8_t runLength = 1;
         uint8_t runByte;
 

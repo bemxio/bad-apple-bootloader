@@ -21,9 +21,8 @@ FPS = $(shell mediainfo --Output='Video;%FrameRate_Num%' $(VIDEO_PATH))
 FRAME_AMOUNT = $(shell mediainfo --Output='Video;%FrameCount%' $(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
-ifdef VERBOSE
-	ASFLAGS += -DVERBOSE_OUTPUT
-	CFLAGS += -DVERBOSE_OUTPUT
+ifdef DEBLOAT
+	ASFLAGS += -DSIZE_OPTIMIZED
 endif
 
 # phony

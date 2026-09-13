@@ -33,7 +33,7 @@ setup_serial:
     add dx, 0x02 ; set the MCR address
     out dx, al ; send the command to the MCR
 
-    %ifdef VERBOSE_OUTPUT
+    %ifndef SIZE_OPTIMIZED
         sub dx, 0x04 ; reset the serial port address
 
         mov si, DEBUG_TYPE_SERIAL ; load the address of the message type
