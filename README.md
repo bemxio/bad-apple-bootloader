@@ -12,12 +12,12 @@ You can do it the manual way with an assembler, a converter that will genenerate
 ### Dependencies
 For Windows, you can install [Scoop](https://scoop.sh/) and run:
 ```powershell
-scoop install nasm make mediainfo ffmpeg
+scoop install nasm make ffmpeg
 ```
 
 As for Linux, all of the packages should be in your default package manager. Here's an example for Debian-based distros:
 ```bash
-sudo apt install nasm make mediainfo ffmpeg
+sudo apt install nasm make ffmpeg
 ```
 
 If you want to run the project, you need to install QEMU as well, by either using Scoop on Windows (`scoop install qemu`) or using your package manager on Linux (`sudo apt install qemu` for Debian).
