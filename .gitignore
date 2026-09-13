@@ -1,30 +1,3 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
-venv/
-.venv/
-venv.bak/
-
-env/
-.env/
-env.bak/
-
-# JetBrains (PyCharm, IntelliJ IDEA, etc.)
-.idea/
-
-# Visual Studio Code
-.vscode/
-
-# Environment files
-.env
-.venv
-
-# Log files
-*.log
-
 # Video files
 *.mp4
 *.avi
@@ -33,11 +6,5 @@ env.bak/
 *.flv
 *.webm
 
-# Binary files
-*.bin
-
 # Build directory
 build/
-
-# Miscellaneous files
-_ignore/
