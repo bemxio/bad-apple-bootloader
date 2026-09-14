@@ -47,6 +47,7 @@ pit_handler:
 
 ; includes
 %include "src/pit.asm"
+%include "src/disk.asm"
 %include "src/video.asm"
 %include "src/audio.asm"
 
