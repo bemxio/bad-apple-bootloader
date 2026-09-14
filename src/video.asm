@@ -1,5 +1,8 @@
 IVT_IRQ0_OFFSET equ 0x0020 ; offset of the first IRQ in the IVT
-BUFFER_OFFSET: dw 0x7e00 ; offset of the chunk buffer
+CHUNK_SIZE equ 64 ; 64 sectors (32,768 bytes) per chunk
+
+VIDEO_BUFFER_OFFSET: dw 0x7e00 ; offset for the compressed frame data
+VIDEO_SECTOR_OFFSET: dw 0x01 ; sector offset of the frame data on the disk
 
 setup_pit:
     pusha ; save registers
@@ -28,11 +31,17 @@ setup_pit:
 decode_frame:
     pusha ; save registers
 
-    mov si, word [BUFFER_OFFSET] ; load the offset of the buffer
+    mov si, word [VIDEO_BUFFER_OFFSET] ; restore the memory offset
+    mov di, word [VIDEO_SECTOR_OFFSET] ; transfer the disk offset to the destination index
+    mov word [SECTOR_OFFSET], di ; restore the disk offset
 
     mov di, 0xa000 ; set the video memory segment
     mov es, di ; move the value to the extra segment register
     xor di, di ; clear the destination index
+
+    mov word [BUFFER_OFFSET], 0x7e00 ; reset the buffer offset
+    mov word [BUFFER_SEGMENT], 0 ; reset the buffer segment
+    mov word [SECTOR_AMOUNT], CHUNK_SIZE ; reset the sector amount
 
     decode_frame_loop:
         lodsb ; load the run length from the buffer
@@ -43,8 +52,8 @@ decode_frame:
         test cl, cl ; check if the run length is zero
         jnz decode_frame_write ; if not, repeat the loop
 
-        mov si, 0x7e00 ; reset the source index
         call read_chunk ; read a chunk of data from the disk
+        mov si, 0x7e00 ; reset the source index
 
         jmp decode_frame_loop ; jump back to the main loop
 
@@ -60,7 +69,9 @@ decode_frame:
             jmp decode_frame_loop ; jump back to the main loop
 
     decode_frame_end:
-        mov word [BUFFER_OFFSET], si ; save the source index
+        mov word [VIDEO_BUFFER_OFFSET], si ; save the frame data memory offset
+        mov di, word [SECTOR_OFFSET] ; load the disk offset into the destination index
+        mov word [VIDEO_SECTOR_OFFSET], di ; save the frame data disk offset
 
         popa ; restore registers
         ret ; return from function

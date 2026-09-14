@@ -1,13 +1,12 @@
 DRIVE_NUMBER: db 0x80 ; main hard drive
-CHUNK_SIZE equ 64 ; 64 sectors (32,768 bytes) per chunk
 
 DISK_ADDRESS_PACKET:
     db 0x10 ; size of the packet (16 bytes)
     db 0x00 ; unused byte, always 0
 
-    dw CHUNK_SIZE ; number of sectors to read
-    dw 0x7e00 ; buffer offset
-    dw 0x00 ; buffer segment
+    SECTOR_AMOUNT: dw 0x40 ; number of sectors to read
+    BUFFER_OFFSET: dw 0x7e00 ; buffer offset
+    BUFFER_SEGMENT: dw 0x00 ; buffer segment
 
     SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
     dd 0x00 ; sector offset (upper 32-bits)
