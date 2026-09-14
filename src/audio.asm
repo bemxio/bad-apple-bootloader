@@ -1,23 +1,9 @@
-DSP_MIXER equ 0x224
-DSP_MIXER_DATA equ 0x225
 DSP_RESET equ 0x226
 DSP_READ equ 0x22a
 DSP_WRITE equ 0x22c
 DSP_READ_STATUS equ 0x22e
 
 IVT_IRQ5_OFFSET equ 0x0034 ; offset of the fifth IRQ in the IVT
-
-%macro outb 2
-    mov dx, %1 ; set the port address
-    mov al, %2 ; set the value to send
-
-    out dx, al ; send the value to the port
-%endmacro
-
-%macro inb 1
-    mov dx, %1 ; set the port address
-    in al, dx ; read the value from the port
-%endmacro
 
 setup_sb16:
     pusha ; save registers
@@ -39,9 +25,6 @@ setup_sb16:
 
     ; set up the IRQ
     cli ; disable interrupts
-
-    outb DSP_WRITE, 0x80 ; send 'Set IRQ' command to the DSP write port
-    outb DSP_WRITE, 0x05 ; IRQ number (5)
 
     inb 0x21 ; read the PIC mask register
     and al, 0xdf ; clear bit 5 (0xDF = 11011111b)
@@ -74,7 +57,7 @@ setup_sb16:
     outb DSP_WRITE, 0x56 ; high byte of the sample rate (22050 Hz)
     outb DSP_WRITE, 0x22 ; low byte of the sample rate
 
-    outb DSP_WRITE, 0xc0 ; 8-bit transfer, playing sound
+    outb DSP_WRITE, 0xc6 ; 8-bit transfer, playing sound, auto initialize mode, FIFO enabled
     outb DSP_WRITE, 0x00 ; unsigned mono
     outb DSP_WRITE, 0xff ; low byte of the transfer length
     outb DSP_WRITE, 0xf9 ; high byte of the transfer length

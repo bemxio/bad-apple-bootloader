@@ -51,14 +51,27 @@ pit_handler:
 %include "src/video.asm"
 %include "src/audio.asm"
 
-; debug messages
 %ifndef SIZE_OPTIMIZED
     %include "src/serial.asm"
 
+    ; strings used for error/debug messages
     DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00
     SB16_ERROR_MESSAGE: db "Error: Sound card initialization failed; expected 0xAA, got 0x", 0x00
     SERIAL_TEST_MESSAGE: db "Hello, world!", 0x00
 %endif
+
+; macros
+%macro outb 2
+    mov dx, %1 ; set the port address
+    mov al, %2 ; set the value to send
+
+    out dx, al ; send the value to the port
+%endmacro
+
+%macro inb 1
+    mov dx, %1 ; set the port address
+    in al, dx ; read the value from the port
+%endmacro
 
 ; pad the rest of the sector with zeros
 times 510 - ($ - $$) db 0x00

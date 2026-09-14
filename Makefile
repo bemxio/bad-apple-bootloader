@@ -28,6 +28,8 @@ FPS = $$(( $(call ffprobe,avg_frame_rate,$(VIDEO_PATH)) ))
 FRAME_AMOUNT = $(call ffprobe,nb_frames,$(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
+DEBLOAT = 1
+
 ifdef DEBLOAT
 	ASFLAGS += -DSIZE_OPTIMIZED
 endif
