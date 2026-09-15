@@ -1,9 +1,20 @@
 DSP_RESET equ 0x226
 DSP_READ equ 0x22a
 DSP_WRITE equ 0x22c
-DSP_READ_STATUS equ 0x22e
+DSP_READ_STATUS equ 0x22f
 
 IVT_IRQ5_OFFSET equ 0x0034 ; offset of the fifth IRQ in the IVT
+
+AUDIO_ADDRESS_PACKET:
+    db 0x10 ; size of the packet (16 bytes)
+    db 0x00 ; unused byte, always 0
+
+    dw CHUNK_SIZE ; number of sectors to read
+    dw 0x0000 ; buffer offset
+    dw 0x1000 ; buffer segment
+
+    AUDIO_SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
+    dd 0x00 ; sector offset (upper 32-bits)
 
 setup_sb16:
     pusha ; save registers
@@ -38,29 +49,33 @@ setup_sb16:
     ; turn on the speaker
     outb DSP_WRITE, 0xd1 ; send 'Turn on speaker' command to the DSP write port
 
-    ; configure ISA DMA channel 1
-    outb 0x0a, 0x05 ; temporarily disable DMA channel 1
-    outb 0x0c, 1 ; activate flip-flop reset register
-    outb 0x0b, 0b01011001 ; single DMA transfer, reading from memory, channel 1
+    ; configure ISA DMA channel 5
+    outb 0xd4, 0x05 ; temporarily disable DMA channel 5
+    outb 0xd8, 1 ; activate flip-flop reset register
+    outb 0xd6, 0b01011001 ; single DMA transfer, reading from memory, channel 5
 
-    outb 0x83, 0x0a ; page number
-    outb 0x02, 0x00 ; low byte of the address
-    outb 0x02, 0x00 ; high byte of the address
+    outb 0x8b, 0x00 ; page number
+    outb 0xc4, 0x00 ; low word of the address
+    outb 0xc4, 0x80 ; high word of the address
 
-    outb 0x03, 0x00 ; low byte of the count
-    outb 0x03, 0xfa ; high byte of the count
+    outb 0xc6, 0xff ; low word of the count
+    outb 0xc6, 0x3f ; high word of the count
 
-    outb 0x0a, 0x01 ; re-enable DMA channel 1
+    outb 0xd4, 0x01 ; re-enable DMA channel 5
 
     ; configure sound card
     outb DSP_WRITE, 0x41 ; send 'Set sample rate' command to the DSP write port
-    outb DSP_WRITE, 0x56 ; high byte of the sample rate (22050 Hz)
-    outb DSP_WRITE, 0x22 ; low byte of the sample rate
+    outb DSP_WRITE, 0xac ; high byte of the sample rate (44100 Hz)
+    outb DSP_WRITE, 0x44 ; low byte of the sample rate
 
-    outb DSP_WRITE, 0xc6 ; 8-bit transfer, playing sound, auto initialize mode, FIFO enabled
-    outb DSP_WRITE, 0x00 ; unsigned mono
-    outb DSP_WRITE, 0xff ; low byte of the transfer length
-    outb DSP_WRITE, 0xf9 ; high byte of the transfer length
+    outb DSP_WRITE, 0xb6 ; 16-bit transfer, playing sound, auto initialize mode, FIFO enabled
+    outb DSP_WRITE, 0b00110000 ; signed stereo
+    outb DSP_WRITE, 0xff ; low word of the transfer length
+    outb DSP_WRITE, 0x3f ; high word of the transfer length
+
+    mov si, AUDIO_ADDRESS_PACKET ; load the address of the packet
+    call read_chunk ; read a chunk of data from the disk
+    add dword [AUDIO_SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
 
     popa ; restore registers
     ret ; return from function
@@ -70,6 +85,10 @@ sb16_handler:
 
     ; acknowledge the interrupt
     inb DSP_READ_STATUS ; read the status port
+
+    mov si, AUDIO_ADDRESS_PACKET ; load the address of the packet
+    call read_chunk ; read a chunk of data from the disk
+    add dword [AUDIO_SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
 
     mov al, 0x20 ; EOI signal
     out 0x20, al ; send the signal to the PIC

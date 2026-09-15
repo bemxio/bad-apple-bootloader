@@ -57,11 +57,13 @@ clean:
 	$(RM) -r build
 
 # rules
-$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/frames.bin $(BUILD_DIR)/sound.bin
+$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/sound.bin
 	cat $^ > $@
 
-$(BUILD_DIR)/bootsector.bin: $(SRC_DIR)/bootsector.asm $(SOURCES) | $(BUILD_DIR)
-	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_AMOUNT) $< -o $@
+$(BUILD_DIR)/bootsector.bin: $(SRC_DIR)/bootsector.asm $(BUILD_DIR)/frames.bin $(SOURCES) | $(BUILD_DIR)
+	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_AMOUNT) \
+		-DAUDIO_DATA_OFFSET=$$(( $(shell stat -c %s $(BUILD_DIR)/frames.bin) + 512 + 1 )) \
+		$< -o $@
 
 $(BUILD_DIR)/frames.bin: $(BUILD_DIR)/compressor $(VIDEO_PATH) $(PALETTE_PATH) | $(BUILD_DIR)
 	ffmpeg -i $(VIDEO_PATH) -f rawvideo -pix_fmt rgb24 -s 16x16 -i $(PALETTE_PATH) \

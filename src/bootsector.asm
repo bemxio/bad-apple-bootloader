@@ -21,8 +21,8 @@ int 0x10 ; call the BIOS interrupt
 xor cx, cx ; clear frame counter
 mov byte [DRIVE_NUMBER], dl ; set the drive number
 
-call setup_pit ; set up the programmable interval timer
-;call setup_sb16 ; set up the sound card
+;call setup_pit ; set up the programmable interval timer
+call setup_sb16 ; set up the sound card
 
 %ifndef SIZE_OPTIMIZED
     mov dx, COM1_SERIAL_PORT ; set the serial port address
@@ -33,8 +33,8 @@ jmp $ ; loop forever
 
 ; includes
 %include "src/disk.asm"
-%include "src/video.asm"
-;%include "src/audio.asm"
+;%include "src/video.asm"
+%include "src/audio.asm"
 
 %ifndef SIZE_OPTIMIZED
     %include "src/serial.asm"
