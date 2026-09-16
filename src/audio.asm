@@ -14,7 +14,7 @@ AUDIO_ADDRESS_PACKET:
     AUDIO_BUFFER_OFFSET: dw 0x0000 ; buffer offset
     dw 0x1000 ; buffer segment
 
-    AUDIO_SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
+    AUDIO_SECTOR_OFFSET: dd 79890 ; sector offset (lower 32-bits)
     dd 0x00 ; sector offset (upper 32-bits)
 
 setup_sb16:

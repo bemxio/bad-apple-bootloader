@@ -12,7 +12,7 @@ VIDEO_ADDRESS_PACKET:
     VIDEO_SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
     dd 0x00 ; sector offset (upper 32-bits)
 
-VIDEO_BUFFER_OFFSET: dw 0x7e00 ; memory offset for the compressed data chunk
+VIDEO_BUFFER_OFFSET: dw 0x7f00 ; memory offset for the compressed data chunk
 
 setup_pit:
     pusha ; save registers
@@ -58,7 +58,7 @@ decode_frame:
 
         mov si, VIDEO_ADDRESS_PACKET ; load the address of the packet
         call read_chunk ; read a chunk of data from the disk
-        add dword [VIDEO_SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset by the chunk size
+        add dword [VIDEO_SECTOR_OFFSET], VIDEO_CHUNK_SIZE ; increment the sector offset by the chunk size
 
         mov si, 0x7e00 ; reset the source index
         jmp decode_frame_loop ; jump back to the main loop

@@ -57,7 +57,7 @@ clean:
 	$(RM) -r build
 
 # rules
-$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/sound.bin
+$(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/frames.bin $(BUILD_DIR)/sound.bin
 	cat $^ > $@
 
 $(BUILD_DIR)/bootsector.bin: $(SRC_DIR)/bootsector.asm $(BUILD_DIR)/frames.bin $(SOURCES) | $(BUILD_DIR)
