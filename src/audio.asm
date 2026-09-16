@@ -4,13 +4,14 @@ DSP_WRITE equ 0x22c
 DSP_READ_STATUS equ 0x22f
 
 IVT_IRQ5_OFFSET equ 0x0034 ; offset of the fifth IRQ in the IVT
+AUDIO_CHUNK_SIZE equ 32 ; 32 sectors (16,384 bytes) per chunk
 
 AUDIO_ADDRESS_PACKET:
     db 0x10 ; size of the packet (16 bytes)
     db 0x00 ; unused byte, always 0
 
-    dw CHUNK_SIZE ; number of sectors to read
-    dw 0x0000 ; buffer offset
+    dw AUDIO_CHUNK_SIZE ; number of sectors to read
+    AUDIO_BUFFER_OFFSET: dw 0x0000 ; buffer offset
     dw 0x1000 ; buffer segment
 
     AUDIO_SECTOR_OFFSET: dd 0x01 ; sector offset (lower 32-bits)
@@ -71,11 +72,18 @@ setup_sb16:
     outb DSP_WRITE, 0xb6 ; 16-bit transfer, playing sound, auto initialize mode, FIFO enabled
     outb DSP_WRITE, 0b00110000 ; signed stereo
     outb DSP_WRITE, 0xff ; low word of the transfer length
-    outb DSP_WRITE, 0x3f ; high word of the transfer length
+    outb DSP_WRITE, 0x1f ; high word of the transfer length
 
+    ; read first initial two chunks
     mov si, AUDIO_ADDRESS_PACKET ; load the address of the packet
+
     call read_chunk ; read a chunk of data from the disk
-    add dword [AUDIO_SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
+    add dword [AUDIO_SECTOR_OFFSET], AUDIO_CHUNK_SIZE ; increment the sector offset
+    mov word [AUDIO_BUFFER_OFFSET], AUDIO_CHUNK_SIZE * 512 ; set the buffer offset
+
+    call read_chunk ; read a second chunk of data from the disk
+    add dword [AUDIO_SECTOR_OFFSET], AUDIO_CHUNK_SIZE ; increment the sector offset
+    mov word [AUDIO_BUFFER_OFFSET], 0 ; set the buffer offset
 
     popa ; restore registers
     ret ; return from function
@@ -86,15 +94,27 @@ sb16_handler:
     ; acknowledge the interrupt
     inb DSP_READ_STATUS ; read the status port
 
+    ; read the next chunk of audio data from the disk
     mov si, AUDIO_ADDRESS_PACKET ; load the address of the packet
+
     call read_chunk ; read a chunk of data from the disk
-    add dword [AUDIO_SECTOR_OFFSET], CHUNK_SIZE ; increment the sector offset
+    add dword [AUDIO_SECTOR_OFFSET], AUDIO_CHUNK_SIZE ; increment the sector offset
 
-    mov al, 0x20 ; EOI signal
-    out 0x20, al ; send the signal to the PIC
+    cmp word [AUDIO_BUFFER_OFFSET], 0 ; check if the buffer offset is 0
+    jne sb16_handler_reset ; if not, jump to reset the buffer offset
 
-    popa ; restore registers
-    iret ; return from interrupt
+    mov word [AUDIO_BUFFER_OFFSET], AUDIO_CHUNK_SIZE * 512 ; set the buffer offset
+    jmp sb16_handler_end ; jump to the end of the handler
+
+    sb16_handler_reset:
+        mov word [AUDIO_BUFFER_OFFSET], 0 ; reset the buffer offset
+
+    sb16_handler_end:
+        mov al, 0x20 ; EOI signal
+        out 0x20, al ; send the signal to the PIC
+
+        popa ; restore registers
+        iret ; return from interrupt
 
 sb16_error:
     %ifndef SIZE_OPTIMIZED

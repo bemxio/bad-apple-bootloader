@@ -1,4 +1,3 @@
-CHUNK_SIZE equ 64 ; 64 sectors (32,768 bytes) per chunk
 DRIVE_NUMBER: db 0x80 ; main hard drive
 
 read_chunk:

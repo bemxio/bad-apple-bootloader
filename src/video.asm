@@ -1,10 +1,11 @@
 IVT_IRQ0_OFFSET equ 0x0020 ; offset of the first IRQ in the IVT
+VIDEO_CHUNK_SIZE equ 64 ; 64 sectors (32,768 bytes) per chunk
 
 VIDEO_ADDRESS_PACKET:
     db 0x10 ; size of the packet (16 bytes)
     db 0x00 ; unused byte, always 0
 
-    dw CHUNK_SIZE ; number of sectors to read
+    dw VIDEO_CHUNK_SIZE ; number of sectors to read
     dw 0x7e00 ; buffer offset
     dw 0x00 ; buffer segment
 
