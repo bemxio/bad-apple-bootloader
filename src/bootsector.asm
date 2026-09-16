@@ -10,8 +10,8 @@ mov byte [DRIVE_NUMBER], dl ; set the drive number
 call setup_pit ; set up the programmable interval timer
 
 %ifndef SIZE_OPTIMIZED
-    mov dx, COM1_SERIAL_PORT ; set the serial port address
     call setup_serial ; set up the serial port
+    mov dx, COM1_PORT ; set the serial port address
 %endif
 
 jmp $ ; loop forever

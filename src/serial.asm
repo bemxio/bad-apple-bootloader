@@ -1,4 +1,10 @@
-COM1_SERIAL_PORT equ 0x3f8 ; COM1 serial port address
+COM1_PORT equ 0x3f8 ; COM1 serial port address
+
+COM1_PORT_IER equ COM1_PORT + 1 ; COM1 Interrupt Enable Register
+COM1_PORT_LCR equ COM1_PORT + 3 ; COM1 Line Control Register
+COM1_PORT_FCR equ COM1_PORT + 2 ; COM1 FIFO Control Register
+COM1_PORT_MCR equ COM1_PORT + 4 ; COM1 Modem Control Register
+
 BAUD_RATE_DIVISOR equ 3 ; baud rate divisor (115200 / 3 = 38400 baud)
 CONNECTION_PARAMETERS equ 0x03 ; connection parameters (8 bits, no parity, 1 stop bit)
 
@@ -6,39 +12,38 @@ setup_serial:
     pusha ; save registers
 
     xor al, al ; disable all interrupts
-    inc dx ; set the IER address
+    mov dx, COM1_PORT_IER ; set the IER address
     out dx, al ; send the command to the IER
 
     mov al, 0x80 ; set the DLAB bit
-    add dx, 0x02 ; set the LCR address
+    mov dx, COM1_PORT_LCR ; set the LCR address
     out dx, al ; send the command to the LCR
 
     mov al, BAUD_RATE_DIVISOR ; get the low byte of the divisor
-    sub dx, 0x03 ; reset the port address
+    mov dx, COM1_PORT ; set the serial port address
     out dx, al ; send the byte to the port
 
     xor al, al ; clear the high byte of the divisor
-    inc dx ; set the IER address
+    mov dx, COM1_PORT_IER ; set the IER address
     out dx, al ; send the high byte of the divisor
 
     mov al, CONNECTION_PARAMETERS ; set the connection parameters
-    add dx, 0x02 ; set the LCR address
+    mov dx, COM1_PORT_LCR ; set the LCR address
     out dx, al ; send the command to the LCR
 
     mov al, 0xc7 ; enable and clear the FIFO with 14-byte threshold
-    dec dx ; set the FCR address
+    mov dx, COM1_PORT_FCR ; set the FCR address
     out dx, al ; send the command to the FCR
 
     mov al, 0x0f ; enable the DTR, RTS, OUT1 and OUT2 pins
-    add dx, 0x02 ; set the MCR address
+    mov dx, COM1_PORT_MCR ; set the MCR address
     out dx, al ; send the command to the MCR
 
     %ifndef SIZE_OPTIMIZED
-        sub dx, 0x04 ; reset the serial port address
-
+        mov dx, COM1_PORT ; set the serial port address
         mov si, SERIAL_TEST_MESSAGE ; load the address of the test message
-        call print ; print it
 
+        call print ; print the message
         call line_break ; add a line break
     %endif
 
