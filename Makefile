@@ -5,9 +5,6 @@ ASFLAGS = -f bin
 CC = gcc
 CFLAGS = -Wall -O2
 
-QEMU = qemu-system-i386
-QEMUFLAGS = -accel kvm -serial stdio
-
 SRC_DIR = src
 BUILD_DIR = build
 
@@ -39,7 +36,17 @@ endif
 all: $(BUILD_DIR)/$(EXECUTABLE)
 
 run: $(BUILD_DIR)/$(EXECUTABLE)
-	$(QEMU) $(QEMUFLAGS) -drive format=raw,file=$^
+	qemu-system-i386 -accel kvm -serial stdio -drive format=raw,file=$^
+
+run-vbox: $(BUILD_DIR)/$(EXECUTABLE)
+	rm -rf /tmp/vbox && mkdir /tmp/vbox
+
+	VBoxManage convertfromraw $< /tmp/vbox/image.vdi --format VDI
+	VBoxManage createvm --basefolder /tmp/vbox --name "Bad Apple Bootloader" --register
+	VBoxManage modifyvm "Bad Apple Bootloader" --memory 4 --cpus 1
+	VBoxManage storagectl "Bad Apple Bootloader" --name "IDE Controller" --add ide --controller PIIX4
+	VBoxManage storageattach "Bad Apple Bootloader" --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium /tmp/vbox/image.vdi
+	VBoxManage startvm "Bad Apple Bootloader" --type gui
 
 clean:
 	$(RM) -r build
@@ -47,6 +54,7 @@ clean:
 # rules
 $(BUILD_DIR)/$(EXECUTABLE): $(BUILD_DIR)/bootsector.bin $(BUILD_DIR)/frames.bin
 	cat $^ > $@
+	truncate -s %512 $@
 
 $(BUILD_DIR)/bootsector.bin: $(SRC_DIR)/bootsector.asm $(SOURCES) | $(BUILD_DIR)
 	$(AS) $(ASFLAGS) -DPIT_RELOAD_VALUE=$(RELOAD_VALUE) -DFRAME_AMOUNT=$(FRAME_AMOUNT) $< -o $@
@@ -57,7 +65,7 @@ $(BUILD_DIR)/frames.bin: $(BUILD_DIR)/compressor $(VIDEO_PATH) $(PALETTE_PATH) |
 		-f rawvideo -pix_fmt rgb24 - | $(BUILD_DIR)/compressor > $@
 
 $(BUILD_DIR)/compressor: $(SRC_DIR)/compressor.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $^ -o $@ 
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(BUILD_DIR):
 	mkdir -p $@

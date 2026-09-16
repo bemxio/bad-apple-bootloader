@@ -1,7 +1,7 @@
 [bits 16] ; 16-bit mode
 [org 0x7c00] ; global offset
 
-mov ax, 0x13 ; 'Set Video Mode' function with 320x200 color mode
+mov ax, 0x13 ; 'Set Video Mode' function with 320x200 256-color video mode
 int 0x10 ; call the BIOS interrupt
 
 xor cx, cx ; clear frame counter
@@ -14,12 +14,11 @@ call setup_pit ; set up the programmable interval timer
     call setup_serial ; set up the serial port
 %endif
 
-loop_forever:
-    jmp $ ; loop forever
+jmp $ ; loop forever
 
 pit_handler:
     cmp cx, FRAME_AMOUNT ; compare frame counter to frame amount
-    je loop_forever ; if equal, loop forever
+    je $ ; if equal, loop forever
 
     call decode_frame ; read the frame into the video memory
     inc cx ; increment the frame counter
@@ -48,12 +47,12 @@ pit_handler:
 %include "src/disk.asm"
 %include "src/video.asm"
 
-; debug messages
 %ifndef SIZE_OPTIMIZED
     %include "src/serial.asm"
 
+    ; strings
+    SERIAL_TEST_MESSAGE: db "Bad Apple Bootloader", 0x00
     DISK_ERROR_MESSAGE: db "Error: Disk read failed with code 0x", 0x00
-    SERIAL_TEST_MESSAGE: db "Hello, world!", 0x00
 %endif
 
 ; pad the rest of the sector with zeros
