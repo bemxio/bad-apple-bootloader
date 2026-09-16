@@ -7,16 +7,12 @@ int 0x10 ; call the BIOS interrupt
 xor cx, cx ; clear frame counter
 mov byte [DRIVE_NUMBER], dl ; set the drive number
 
-cli ; disable interrupts
-
 call setup_pit ; set up the programmable interval timer
 
 %ifndef SIZE_OPTIMIZED
     mov dx, COM1_SERIAL_PORT ; set the serial port address
     call setup_serial ; set up the serial port
 %endif
-
-sti ; re-enable interrupts
 
 loop_forever:
     jmp $ ; loop forever
@@ -49,7 +45,7 @@ pit_handler:
     iret ; return from interrupt
 
 ; includes
-%include "src/pit.asm"
+%include "src/disk.asm"
 %include "src/video.asm"
 
 ; debug messages

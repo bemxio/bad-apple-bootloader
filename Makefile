@@ -17,14 +17,14 @@ EXECUTABLE = image.img
 VIDEO_PATH = video.mp4
 PALETTE_PATH = palette.bin
 
-# other constants calculated at build time
+# constants calculated at build time
 define ffprobe
 $(shell ffprobe -v error -select_streams v:0 \
 	-show_entries stream=$(1) \
 	-of default=noprint_wrappers=1:nokey=1 $(2))
 endef
 
-FPS = $$(( $(call ffprobe,avg_frame_rate,$(VIDEO_PATH)) ))
+FPS = $$(($(call ffprobe,avg_frame_rate,$(VIDEO_PATH))))
 FRAME_AMOUNT = $(call ffprobe,nb_frames,$(VIDEO_PATH))
 RELOAD_VALUE = $$((1193182 / $(FPS)))
 
